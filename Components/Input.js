@@ -4,6 +4,12 @@ import { TextInput, View } from 'react-native';
 export default function Input({ shouldFocus }) {
     const [text, setText] = useState("");
     const [isFocused, setIsFocused] = useState(false);
+
+    const handleBlur = () => {
+        setIsFocused(false);
+    };
+
+
     return (
         <View>
             <TextInput
@@ -18,7 +24,7 @@ export default function Input({ shouldFocus }) {
                 }}
                 autoFocus={shouldFocus}
                 onFocus={() => setIsFocused(true)}
-
+                onBlur={handleBlur}
             />
 
         </View>
