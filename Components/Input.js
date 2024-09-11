@@ -27,7 +27,7 @@ export default function Input({ shouldFocus }) {
                 onBlur={handleBlur}
             />
             {isFocused && <Text>Characters: {text.length}</Text>}
-            {!isFocused && text.length > 0 && (
+            {isFocused && text.length > 0 && (
                 <Text>
                     {text.length >= 3 ? "Thank you" : "Please type more than 3 characters"}
                 </Text>
