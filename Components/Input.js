@@ -26,7 +26,7 @@ export default function Input({ shouldFocus }) {
                 onFocus={() => setIsFocused(true)}
                 onBlur={handleBlur}
             />
-
+            {isFocused && <Text>Characters: {text.length}</Text>}
         </View>
     );
 }
