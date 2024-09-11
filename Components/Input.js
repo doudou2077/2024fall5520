@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { TextInput, View, Text } from 'react-native';
 
 export default function Input({ shouldFocus }) {
     const [text, setText] = useState("");
@@ -27,6 +27,12 @@ export default function Input({ shouldFocus }) {
                 onBlur={handleBlur}
             />
             {isFocused && <Text>Characters: {text.length}</Text>}
+            {!isFocused && text.length > 0 && (
+                <Text>
+                    {text.length >= 3 ? "Thank you" : "Please type more than 3 characters"}
+                </Text>
+            )}
+
         </View>
     );
 }
