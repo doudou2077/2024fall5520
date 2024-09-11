@@ -3,6 +3,7 @@ import { TextInput, View } from 'react-native';
 
 export default function Input({ shouldFocus }) {
     const [text, setText] = useState("");
+    const [isFocused, setIsFocused] = useState(false);
     return (
         <View>
             <TextInput
@@ -16,6 +17,8 @@ export default function Input({ shouldFocus }) {
                     setText(changedText);
                 }}
                 autoFocus={shouldFocus}
+                onFocus={() => setIsFocused(true)}
+
             />
 
         </View>
