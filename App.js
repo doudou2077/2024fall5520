@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Header from './Components/Header';
 import Input from './Components/Input';
 
@@ -11,8 +11,8 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Header name={appName} />
-      <Input />
       {/* <Text>{text}</Text> */}
+      <Input shouldFocus={true} />
     </View>
   );
 }
