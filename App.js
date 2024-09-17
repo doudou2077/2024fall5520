@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, Button, StatusBar, SafeAreaView } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { StyleSheet, View, Text, Button, StatusBar, SafeAreaView, Alert } from 'react-native';
 import Header from './Components/Header';
 import Input from './Components/Input';
 
@@ -7,6 +7,17 @@ export default function App() {
   const appName = "My App";
   const [inputText, setInputText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const closeModal = useCallback(() => {
+    Alert.alert(
+      "Confirm Cancel",
+      "Are you sure you want to cancel?",
+      [
+        { text: "No", style: "cancel" },
+        { text: "Yes", onPress: () => setIsModalVisible(false) }
+      ]
+    );
+  }, []);
 
   const handleInputData = (text) => {
     setInputText(text);
@@ -32,6 +43,7 @@ export default function App() {
         shouldFocus={true}
         onDataConfirm={handleInputData}
         isModalVisible={isModalVisible}
+        onCancel={closeModal}
       />
     </SafeAreaView>
   );
