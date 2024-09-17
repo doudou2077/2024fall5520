@@ -8,7 +8,14 @@ export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCa
     const handleConfirm = () => {
         console.log("Final text on confirm:", text);
         onDataConfirm(text);
+        setText("");
     };
+
+    const handleCancel = () => {
+        onCancel();
+        setText('');
+    };
+
 
     return (
         <Modal animationType="slide" transparent={true} visible={isModalVisible}>
@@ -32,7 +39,7 @@ export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCa
                     )}
                     <View style={styles.buttonContainer}>
                         <Button title="Confirm" onPress={handleConfirm} />
-                        <Button title="Cancel" onPress={onCancel} color="#FF6347" />
+                        <Button title="Cancel" onPress={handleCancel} color="#FF6347" />
                     </View>
                 </View>
             </View>
