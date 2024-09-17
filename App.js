@@ -19,21 +19,20 @@ export default function App() {
       <View style={styles.topContainer}>
         <StatusBar style="auto" />
         <Header name={appName} />
-        <Text>Children</Text>
         <Button
           title="Add a Goal"
           onPress={() => setIsModalVisible(true)}
-        />
-        <Input
-          shouldFocus={true}
-          onDataConfirm={handleInputData}
-          isModalVisible={isModalVisible}
+          style={styles.button}
         />
       </View>
-      <Text style={styles.textStyle}>{inputText}</Text>
       <View style={styles.bottomContainer}>
-        {/* Additional components or features can go here */}
+        <Text style={styles.textStyle}>{inputText}</Text>
       </View>
+      <Input
+        shouldFocus={true}
+        onDataConfirm={handleInputData}
+        isModalVisible={isModalVisible}
+      />
     </SafeAreaView>
   );
 }
@@ -42,8 +41,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   textStyle: {
     fontSize: 20,
@@ -51,11 +48,17 @@ const styles = StyleSheet.create({
   },
   topContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
     flex: 1,
   },
   bottomContainer: {
     flex: 4,
     backgroundColor: '#dcd',
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  button: {
+    width: '30%',
+    margin: 10,
   },
 });
