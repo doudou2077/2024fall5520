@@ -16,6 +16,7 @@ export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCa
         setText('');
     };
 
+    const isConfirmEnabled = text.length >= 3;
 
     return (
         <Modal animationType="slide" transparent={true} visible={isModalVisible}>
@@ -38,7 +39,7 @@ export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCa
                         </Text>
                     )}
                     <View style={styles.buttonContainer}>
-                        <Button title="Confirm" onPress={handleConfirm} />
+                        <Button title="Confirm" onPress={handleConfirm} disabled={!isConfirmEnabled} />
                         <Button title="Cancel" onPress={handleCancel} color="#FF6347" />
                     </View>
                 </View>
