@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, View, Text, Button, Modal, StyleSheet } from 'react-native';
+import { TextInput, View, Text, Button, Modal, StyleSheet, Image } from 'react-native';
 
 export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCancel }) {
     const [text, setText] = useState("");
@@ -21,6 +21,7 @@ export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCa
     return (
         <Modal animationType="slide" transparent={true} visible={isModalVisible}>
             <View style={styles.modalBackground}>
+
                 <View style={styles.container}>
                     <TextInput
                         placeholder="Type here"
@@ -38,10 +39,25 @@ export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCa
                             {text.length >= 3 ? "Thank you!" : "Please type more than 3 characters"}
                         </Text>
                     )}
+
                     <View style={styles.buttonContainer}>
                         <Button title="Confirm" onPress={handleConfirm} disabled={!isConfirmEnabled} />
                         <Button title="Cancel" onPress={handleCancel} color="#FF6347" />
                     </View>
+
+                    <View style={styles.imageContainer}>
+                        <Image
+                            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2617/2617812.png' }}
+                            style={styles.imageStyle}
+                            alt="Network image icon"
+                        />
+                        <Image
+                            source={require('../assets/target.png')}
+                            style={styles.imageStyle}
+                            alt="Local image icon"
+                        />
+                    </View>
+
                 </View>
             </View>
         </Modal>
@@ -76,8 +92,20 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: 'row',
-        jusrifyContent: 'space-between',
+        justifyContent: 'space-between',
         width: '100%',
         marginTop: 10,
+    },
+
+    imageContainer: {
+        flexDirection: 'center',
+        justifyContent: 'space-around',
+        width: '100%',
+        marginBottom: 10,
+    },
+    imageStyle: {
+        width: 100,
+        height: 100,
+        marginBottom: 10,
     },
 });

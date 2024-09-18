@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     fontSize: 20,
-    color: 'violet',
+    color: 'red',
   },
   topContainer: {
     alignItems: 'center',
