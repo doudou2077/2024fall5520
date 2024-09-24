@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Text, Button, StatusBar, SafeAreaView, Alert } from 'react-native';
+import { StyleSheet, View, Text, Button, StatusBar, SafeAreaView, Alert, ScrollView } from 'react-native';
 import Header from './Components/Header';
 import Input from './Components/Input';
 
 export default function App() {
   const appName = "My App";
-  const [inputText, setInputText] = useState("");
+  const [goals, setGoals] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const closeModal = useCallback(() => {
@@ -20,8 +20,13 @@ export default function App() {
   }, []);
 
   const handleInputData = (text) => {
-    setInputText(text);
-    console.log("App.js:", text);
+    // setInputText(text);
+    // add a new object
+    const newGoal = {
+      id: Math.floor(Math.random() * 10000),
+      text: text,
+    };
+    setGoals(currentGoals => [...currentGoals, newGoal]);
     setIsModalVisible(false);
   };
 
@@ -36,9 +41,22 @@ export default function App() {
           style={styles.button}
         />
       </View>
+
       <View style={styles.bottomContainer}>
-        <Text style={styles.textStyle}>{inputText}</Text>
+        <ScrollView>
+          {goals.map((goal) => (
+            console.log(goal),
+            <View key={goal.id} style={styles.goalItemContainer}>
+              <Text style={styles.goalText}>{goal.text}</Text>
+            </View>
+          ))}
+        </ScrollView>
+
       </View>
+      {/* <View style={styles.bottomContainer}>
+        <Text style={styles.textStyle}>{inputText}</Text>
+      </View> */}
+
       <Input
         shouldFocus={true}
         onDataConfirm={handleInputData}
@@ -54,9 +72,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+
   textStyle: {
     fontSize: 20,
     color: 'red',
+    padding: 5,
+    borderRadius: 5,
   },
   topContainer: {
     alignItems: 'center',
@@ -73,4 +94,20 @@ const styles = StyleSheet.create({
     width: '30%',
     margin: 10,
   },
+  goalItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e9ecef',
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    width: '90%',
+    alignSelf: 'center',
+  },
+  goalText: {
+    fontSize: 16,
+  },
+
 });

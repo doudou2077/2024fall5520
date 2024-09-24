@@ -19,9 +19,8 @@ export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCa
     const isConfirmEnabled = text.length >= 3;
 
     return (
-        <Modal animationType="slide" transparent={true} visible={isModalVisible}>
+        <Modal animationType="slide" transparent={true} visible={isModalVisible} >
             <View style={styles.modalBackground}>
-
                 <View style={styles.container}>
                     <TextInput
                         placeholder="Type here"
@@ -69,10 +68,9 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     container: {
-        backgroundColor: '#fff',
+        backgroundColor: 'grey',
         padding: 20,
         borderRadius: 10,
         alignItems: 'center',
