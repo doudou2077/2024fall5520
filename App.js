@@ -1,12 +1,13 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Text, Button, StatusBar, SafeAreaView, Alert, ScrollView } from 'react-native';
+import { StyleSheet, View, Button, StatusBar, SafeAreaView, Alert, FlatList } from 'react-native';
 import Header from './Components/Header';
 import Input from './Components/Input';
+import GoalItem from './Components/GoalItem';
 
 export default function App() {
   const appName = "My App";
-  const [goals, setGoals] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [goals, setGoals] = useState([]);
 
   const closeModal = useCallback(() => {
     Alert.alert(
@@ -23,12 +24,25 @@ export default function App() {
     // setInputText(text);
     // add a new object
     const newGoal = {
-      id: Math.floor(Math.random() * 10000),
+      id: Math.floor(Math.random() * 10000).toString(),
       text: text,
     };
     setGoals(currentGoals => [...currentGoals, newGoal]);
     setIsModalVisible(false);
   };
+
+  const renderItem = ({ item }) => (
+    <GoalItem
+      goal={item}
+      handleDelete={handleDelete}
+    />
+  )
+
+  // The delete function
+  const handleDelete = (goalId) => {
+    console.log("Deleting goal with id:", goalId);
+    setGoals(currentGoals => currentGoals.filter(goal => goal.id !== goalId));
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -43,14 +57,20 @@ export default function App() {
       </View>
 
       <View style={styles.bottomContainer}>
-        <ScrollView>
+        <FlatList
+          data={goals}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContainerStyle}
+        />
+        {/* <ScrollView>
           {goals.map((goal) => (
             console.log(goal),
             <View key={goal.id} style={styles.goalItemContainer}>
               <Text style={styles.goalText}>{goal.text}</Text>
             </View>
           ))}
-        </ScrollView>
+        </ScrollView> */}
 
       </View>
       {/* <View style={styles.bottomContainer}>
@@ -89,9 +109,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#dcd',
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%',
   },
   button: {
-    width: '30%',
+    width: '60%',
     margin: 10,
   },
   goalItemContainer: {
@@ -108,6 +129,12 @@ const styles = StyleSheet.create({
   },
   goalText: {
     fontSize: 16,
+  },
+  listContainerStyle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    paddingVertical: 20,
   },
 
 });
