@@ -1,18 +1,48 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, Button, StatusBar, SafeAreaView } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { StyleSheet, View, Button, StatusBar, SafeAreaView, Alert, FlatList } from 'react-native';
 import Header from './Components/Header';
 import Input from './Components/Input';
+import GoalItem from './Components/GoalItem';
 
 export default function App() {
   const appName = "My App";
-  const [inputText, setInputText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [goals, setGoals] = useState([]);
+
+  const closeModal = useCallback(() => {
+    Alert.alert(
+      "Confirm Cancel",
+      "Are you sure you want to cancel?",
+      [
+        { text: "No", style: "cancel" },
+        { text: "Yes", onPress: () => setIsModalVisible(false) }
+      ]
+    );
+  }, []);
 
   const handleInputData = (text) => {
-    setInputText(text);
-    console.log("App.js:", text);
+    // setInputText(text);
+    // add a new object
+    const newGoal = {
+      id: Math.floor(Math.random() * 10000).toString(),
+      text: text,
+    };
+    setGoals(currentGoals => [...currentGoals, newGoal]);
     setIsModalVisible(false);
   };
+
+  const renderItem = ({ item }) => (
+    <GoalItem
+      goal={item}
+      handleDelete={handleDelete}
+    />
+  )
+
+  // The delete function
+  const handleDelete = (goalId) => {
+    console.log("Deleting goal with id:", goalId);
+    setGoals(currentGoals => currentGoals.filter(goal => goal.id !== goalId));
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -25,13 +55,33 @@ export default function App() {
           style={styles.button}
         />
       </View>
+
       <View style={styles.bottomContainer}>
-        <Text style={styles.textStyle}>{inputText}</Text>
+        <FlatList
+          data={goals}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContainerStyle}
+        />
+        {/* <ScrollView>
+          {goals.map((goal) => (
+            console.log(goal),
+            <View key={goal.id} style={styles.goalItemContainer}>
+              <Text style={styles.goalText}>{goal.text}</Text>
+            </View>
+          ))}
+        </ScrollView> */}
+
       </View>
+      {/* <View style={styles.bottomContainer}>
+        <Text style={styles.textStyle}>{inputText}</Text>
+      </View> */}
+
       <Input
         shouldFocus={true}
         onDataConfirm={handleInputData}
         isModalVisible={isModalVisible}
+        onCancel={closeModal}
       />
     </SafeAreaView>
   );
@@ -42,9 +92,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+
   textStyle: {
     fontSize: 20,
-    color: 'violet',
+    color: 'red',
+    padding: 5,
+    borderRadius: 5,
   },
   topContainer: {
     alignItems: 'center',
@@ -56,9 +109,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#dcd',
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%',
   },
   button: {
-    width: '30%',
+    width: '60%',
     margin: 10,
   },
+  goalItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e9ecef',
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    width: '90%',
+    alignSelf: 'center',
+  },
+  goalText: {
+    fontSize: 16,
+  },
+  listContainerStyle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    paddingVertical: 20,
+  },
+
 });

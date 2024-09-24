@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
-import { TextInput, View, Text, Button, Modal, StyleSheet } from 'react-native';
+import { TextInput, View, Text, Button, Modal, StyleSheet, Image } from 'react-native';
 
-export default function Input({ shouldFocus, onDataConfirm, isModalVisible }) {
+export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCancel }) {
     const [text, setText] = useState("");
     const [isFocused, setIsFocused] = useState(false);
 
     const handleConfirm = () => {
         console.log("Final text on confirm:", text);
         onDataConfirm(text);
+        setText("");
     };
 
+    const handleCancel = () => {
+        onCancel();
+        setText('');
+    };
+
+    const isConfirmEnabled = text.length >= 3;
+
     return (
-        <Modal animationType="slide" transparent={true} visible={isModalVisible}>
+        <Modal animationType="slide" transparent={true} visible={isModalVisible} >
             <View style={styles.modalBackground}>
                 <View style={styles.container}>
                     <TextInput
@@ -30,9 +38,25 @@ export default function Input({ shouldFocus, onDataConfirm, isModalVisible }) {
                             {text.length >= 3 ? "Thank you!" : "Please type more than 3 characters"}
                         </Text>
                     )}
+
                     <View style={styles.buttonContainer}>
-                        <Button title="Confirm" onPress={handleConfirm} />
+                        <Button title="Confirm" onPress={handleConfirm} disabled={!isConfirmEnabled} />
+                        <Button title="Cancel" onPress={handleCancel} color="#FF6347" />
                     </View>
+
+                    <View style={styles.imageContainer}>
+                        <Image
+                            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2617/2617812.png' }}
+                            style={styles.imageStyle}
+                            alt="Network image icon"
+                        />
+                        <Image
+                            source={require('../assets/target.png')}
+                            style={styles.imageStyle}
+                            alt="Local image icon"
+                        />
+                    </View>
+
                 </View>
             </View>
         </Modal>
@@ -44,10 +68,9 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     container: {
-        backgroundColor: '#fff',
+        backgroundColor: 'grey',
         padding: 20,
         borderRadius: 10,
         alignItems: 'center',
@@ -66,7 +89,21 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     buttonContainer: {
-        width: '30%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
         marginTop: 10,
+    },
+
+    imageContainer: {
+        flexDirection: 'center',
+        justifyContent: 'space-around',
+        width: '100%',
+        marginBottom: 10,
+    },
+    imageStyle: {
+        width: 100,
+        height: 100,
+        marginBottom: 10,
     },
 });
