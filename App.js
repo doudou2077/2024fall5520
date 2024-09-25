@@ -79,6 +79,11 @@ export default function App() {
 
   );
 
+  const ItemSeparator = () => {
+    console.log("Rendering Separator");
+    return <View style={styles.separator} />;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
 
@@ -101,6 +106,7 @@ export default function App() {
           ListEmptyComponent={EmptyListComponent}
           ListHeaderComponent={goals.length > 0 ? ListHeader : null}
           ListFooterComponent={goals.length > 0 ? <ListFooter onPressDeleteAll={handleDeleteAll} /> : null}
+          ItemSeparatorComponent={ItemSeparator}
         />
         {/* <ScrollView>
           {goals.map((goal) => (
@@ -156,24 +162,20 @@ const styles = StyleSheet.create({
   goalItemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e9ecef',
     padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    width: '90%',
-    alignSelf: 'center',
+    marginVertical: 10,
+    backgroundColor: '#e9ecef',
   },
   goalText: {
     fontSize: 16,
   },
   listContainerStyle: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
     paddingVertical: 20,
   },
+
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -203,4 +205,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
+  separator: {
+    height: 2,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: 'rgb(90,90,90)',
+  },
+
 });
