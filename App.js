@@ -164,11 +164,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    backgroundColor: '#f8f9fa'
+    backgroundColor: 'transparent',
+    borderRadius: 5,
   },
   headerText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#343a40'
+    color: '#343a40',
+    padding: 5,
   },
 });
