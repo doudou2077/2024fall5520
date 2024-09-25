@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Button, StatusBar, SafeAreaView, Alert, FlatList } from 'react-native';
+import { StyleSheet, View, Button, StatusBar, SafeAreaView, Alert, FlatList, Text } from 'react-native';
 import Header from './Components/Header';
 import Input from './Components/Input';
 import GoalItem from './Components/GoalItem';
@@ -36,7 +36,7 @@ export default function App() {
       goal={item}
       handleDelete={handleDelete}
     />
-  )
+  );
 
   // The delete function
   const handleDelete = (goalId) => {
@@ -44,8 +44,21 @@ export default function App() {
     setGoals(currentGoals => currentGoals.filter(goal => goal.id !== goalId));
   }
 
+  const EmptyListComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No goals to show</Text>
+    </View>
+  );
+
+  const ListHeader = () => (
+    <View style={styles.headerContainer}>
+      <Text style={styles.headerText}>My Goals</Text>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
+
       <View style={styles.topContainer}>
         <StatusBar style="auto" />
         <Header name={appName} />
@@ -62,6 +75,8 @@ export default function App() {
           renderItem={renderItem}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.listContainerStyle}
+          ListEmptyComponent={EmptyListComponent}
+          ListHeaderComponent={goals.length > 0 ? ListHeader : null}
         />
         {/* <ScrollView>
           {goals.map((goal) => (
@@ -71,7 +86,6 @@ export default function App() {
             </View>
           ))}
         </ScrollView> */}
-
       </View>
       {/* <View style={styles.bottomContainer}>
         <Text style={styles.textStyle}>{inputText}</Text>
@@ -136,5 +150,25 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 20,
   },
-
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50,
+  },
+  emptyText: {
+    fontSize: 20,
+    color: 'gray',
+  },
+  headerContainer: {
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: '#f8f9fa'
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#343a40'
+  },
 });
