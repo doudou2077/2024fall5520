@@ -56,6 +56,29 @@ export default function App() {
     </View>
   );
 
+  const handleDeleteAll = () => {
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete all goals?",
+      [
+        { text: "No", style: "cancel" },
+        { text: "Yes", onPress: () => setGoals([]) }
+      ]
+
+    );
+  };
+
+  const ListFooter = ({ onPressDeleteAll }) => (
+    <View style={styles.footerContainer}>
+      <Button
+        title="Delete All"
+        onPress={onPressDeleteAll}
+        color="blue"
+      />
+    </View>
+
+  );
+
   return (
     <SafeAreaView style={styles.container}>
 
@@ -77,6 +100,7 @@ export default function App() {
           contentContainerStyle={styles.listContainerStyle}
           ListEmptyComponent={EmptyListComponent}
           ListHeaderComponent={goals.length > 0 ? ListHeader : null}
+          ListFooterComponent={goals.length > 0 ? <ListFooter onPressDeleteAll={handleDeleteAll} /> : null}
         />
         {/* <ScrollView>
           {goals.map((goal) => (
@@ -172,5 +196,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#343a40',
     padding: 5,
+  },
+  footerContainer: {
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
 });
