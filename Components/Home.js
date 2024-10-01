@@ -4,7 +4,7 @@ import Header from './Header';
 import Input from './Input';
 import GoalItem from './GoalItem';
 
-export default function Home() {
+export default function Home({ navigation }) {
     const appName = "My App";
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [goals, setGoals] = useState([]);
@@ -33,6 +33,7 @@ export default function Home() {
         <GoalItem
             goal={item}
             handleDelete={handleDelete}
+            onPressDetails={() => handleGoalDetails(item.text)}
         />
     );
 
@@ -77,6 +78,10 @@ export default function Home() {
     const ItemSeparator = () => {
         console.log("Rendering Separator");
         return <View style={styles.separator} />;
+    };
+
+    const handleGoalDetails = (goalText) => {
+        navigation.navigate('GoalDetails', { goalText });
     };
 
     return (
