@@ -1,33 +1,30 @@
 import React from 'react';
-import { StyleSheet, StatusBar, View } from 'react-native';
+import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from './Components/Home';
-
+import GoalDetails from './Components/GoalDetails';
 
 const Stack = createNativeStackNavigator();
+
 const App = () => {
   return (
     <NavigationContainer>
-      <View style={styles.container}>
-        <StatusBar style="auto" />
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{ title: 'My App' }}
-          />
-        </Stack.Navigator>
-      </View>
+      <StatusBar style="auto" />
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{ title: 'My App' }}
+        />
+        <Stack.Screen
+          name="GoalDetails"
+          component={GoalDetails}
+          options={{ title: 'Goal Details' }}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-});
 
 export default App;
