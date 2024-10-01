@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from './Components/Home';
@@ -15,12 +15,40 @@ const App = () => {
         <Stack.Screen
           name="Home"
           component={Home}
-          options={{ title: 'My App' }}
+          options={{
+            title: 'Goal Tracker',
+            headerStyle: {
+              backgroundColor: 'lightsteelblue',
+            },
+            headerTintColor: 'black',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
         />
         <Stack.Screen
           name="GoalDetails"
           component={GoalDetails}
-          options={{ title: 'Goal Details' }}
+          options={({ route }) => ({
+            title: route.params.goal && route.params.goal.text,
+            headerStyle: {
+              backgroundColor: 'lightsteelblue',
+            },
+            headerTintColor: 'black',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+            headerBackTitle: 'Back',
+            headerRight: () => (
+              <Button
+                onPress={() => {
+                  console.log('This is a button!');
+                }}
+                title="Action"
+                color="#000"
+              />
+            ),
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

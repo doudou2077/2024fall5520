@@ -33,7 +33,7 @@ export default function Home({ navigation }) {
         <GoalItem
             goal={item}
             handleDelete={handleDelete}
-            onPressDetails={() => handleGoalDetails(item.text)}
+            onPressDetails={handleGoalDetails}
         />
     );
 
@@ -80,8 +80,8 @@ export default function Home({ navigation }) {
         return <View style={styles.separator} />;
     };
 
-    const handleGoalDetails = (goalText) => {
-        navigation.navigate('GoalDetails', { goalText });
+    const handleGoalDetails = (goal) => {
+        navigation.navigate('GoalDetails', { goal });
     };
 
     return (

@@ -8,7 +8,7 @@ const GoalItem = ({ goal, handleDelete, onPressDetails }) => {
             <TouchableOpacity style={styles.buttonContainer} onPress={() => handleDelete(goal.id)}>
                 <Text style={styles.buttonText}>X</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.infoButton} onPress={onPressDetails}>
+            <TouchableOpacity style={styles.infoButton} onPress={() => onPressDetails(goal)}>
                 <Text style={styles.infoButtonText}>i</Text>
             </TouchableOpacity>
         </View>
