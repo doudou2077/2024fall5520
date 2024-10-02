@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Button, FlatList, Text } from 'react-native';
+import { StyleSheet, View, Button, FlatList, Text, Alert } from 'react-native';
 import Header from './Header';
 import Input from './Input';
 import GoalItem from './GoalItem';
