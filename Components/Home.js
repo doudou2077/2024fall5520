@@ -29,6 +29,9 @@ export default function Home({ navigation }) {
         setIsModalVisible(false);
     };
 
+    const handleGoalDetails = (goal) => {
+        navigation.navigate('GoalDetails', { goal });
+    };
     const renderItem = ({ item }) => (
         <GoalItem
             goal={item}
@@ -78,10 +81,6 @@ export default function Home({ navigation }) {
     const ItemSeparator = () => {
         console.log("Rendering Separator");
         return <View style={styles.separator} />;
-    };
-
-    const handleGoalDetails = (goal) => {
-        navigation.navigate('GoalDetails', { goal });
     };
 
     return (
