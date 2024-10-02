@@ -7,7 +7,11 @@ const GoalDetails = ({ route, navigation }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: isWarning ? 'Warning!' : (goal && goal.text ? goal.text : 'Goal Details'),
+            title: isWarning
+                ? 'Warning!'
+                : (route.params.moreDetails
+                    ? (route.params.goalText || 'More Details')
+                    : (goal && goal.text ? goal.text : 'Goal Details')),
             headerRight: () => (
                 <Button
                     onPress={() => setIsWarning(!isWarning)}
@@ -16,9 +20,13 @@ const GoalDetails = ({ route, navigation }) => {
                 />
             ),
         });
-    }, [navigation, isWarning, goal]);
+    }, [navigation, isWarning, goal, route.params]);
+
     const handleMoreDetails = () => {
-        navigation.push('GoalDetails', { moreDetails: "More Details" });
+        navigation.push('GoalDetails', {
+            moreDetails: "More Details",
+            goalText: goal.text
+        });
     };
 
     if (route.params.moreDetails) {
