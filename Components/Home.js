@@ -29,14 +29,11 @@ export default function Home({ navigation }) {
         setIsModalVisible(false);
     };
 
-    const handleGoalDetails = (goal) => {
-        navigation.navigate('GoalDetails', { goal });
-    };
     const renderItem = ({ item }) => (
         <GoalItem
             goal={item}
             handleDelete={handleDelete}
-            onPressDetails={handleGoalDetails}
+            navigation={navigation}
         />
     );
 
