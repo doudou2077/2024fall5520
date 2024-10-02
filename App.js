@@ -35,15 +35,6 @@ const App = () => {
           options={({ route }) => ({
             title: route.params.goal && route.params.goal.text,
             headerBackTitle: 'Back',
-            headerRight: () => (
-              <Button
-                onPress={() => {
-                  console.log('This is a button!');
-                }}
-                title="Action"
-                color="#000"
-              />
-            ),
           })}
         />
       </Stack.Navigator>
