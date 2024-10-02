@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Button, FlatList, Text } from 'react-native';
+import { StyleSheet, View, Button, FlatList, Text, Alert } from 'react-native';
 import Header from './Header';
 import Input from './Input';
 import GoalItem from './GoalItem';
@@ -33,7 +33,7 @@ export default function Home({ navigation }) {
         <GoalItem
             goal={item}
             handleDelete={handleDelete}
-            onPressDetails={handleGoalDetails}
+            navigation={navigation}
         />
     );
 
@@ -78,10 +78,6 @@ export default function Home({ navigation }) {
     const ItemSeparator = () => {
         console.log("Rendering Separator");
         return <View style={styles.separator} />;
-    };
-
-    const handleGoalDetails = (goal) => {
-        navigation.navigate('GoalDetails', { goal });
     };
 
     return (

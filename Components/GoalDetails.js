@@ -1,27 +1,47 @@
-import React from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 
 const GoalDetails = ({ route, navigation }) => {
     const { goal } = route.params;
+    const [isWarning, setIsWarning] = useState(false);
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: isWarning
+                ? 'Warning!'
+                : (route.params.moreDetails
+                    ? (route.params.goalText || 'More Details')
+                    : (goal && goal.text ? goal.text : 'Goal Details')),
+            headerRight: () => (
+                <Button
+                    onPress={() => setIsWarning(!isWarning)}
+                    title="Warning"
+                    color="#000"
+                />
+            ),
+        });
+    }, [navigation, isWarning, goal, route.params]);
+
     const handleMoreDetails = () => {
-        navigation.push('GoalDetails', { moreDetails: "More Details" });
+        navigation.push('GoalDetails', {
+            moreDetails: "More Details",
+            goalText: goal.text
+        });
     };
 
     if (route.params.moreDetails) {
         return (
             <View style={styles.container}>
-                <Text style={styles.title}>{route.params.moreDetails}</Text>
+                <Text style={[styles.title, isWarning && styles.warningText]}>{route.params.moreDetails}</Text>
             </View>
         );
     }
 
-
-
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Goal Details</Text>
-            <Text style={styles.goalText}>Goal: {goal.text}</Text>
-            <Text style={styles.goalId}>Goal ID: {goal.id}</Text>
+            <Text style={[styles.title, isWarning && styles.warningText]}>Goal Details</Text>
+            <Text style={[styles.goalText, isWarning && styles.warningText]}>Goal: {goal.text}</Text>
+            <Text style={[styles.goalId, isWarning && styles.warningText]}>Goal ID: {goal.id}</Text>
             <View style={styles.buttonContainer}>
                 <Button
                     title="More Details"
@@ -55,6 +75,9 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         marginTop: 20,
+    },
+    warningText: {
+        color: 'red',
     },
 });
 

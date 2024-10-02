@@ -1,14 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const GoalItem = ({ goal, handleDelete, onPressDetails }) => {
+const GoalItem = ({ goal, handleDelete, navigation }) => {
+
+    const handleGoalDetails = () => {
+        navigation.navigate('GoalDetails', { goal });
+    }
     return (
         <View style={styles.textContainer}>
             <Text style={styles.textStyle}>{goal.text}</Text>
             <TouchableOpacity style={styles.buttonContainer} onPress={() => handleDelete(goal.id)}>
                 <Text style={styles.buttonText}>X</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.infoButton} onPress={() => onPressDetails(goal)}>
+            <TouchableOpacity style={styles.infoButton} onPress={handleGoalDetails}>
                 <Text style={styles.infoButtonText}>i</Text>
             </TouchableOpacity>
         </View>
