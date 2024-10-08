@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 
 const GoalItem = ({ goal, handleDelete, navigation }) => {
 
@@ -7,7 +7,14 @@ const GoalItem = ({ goal, handleDelete, navigation }) => {
         navigation.navigate('GoalDetails', { goal });
     }
     return (
-        <View style={styles.textContainer}>
+        <Pressable
+            onPress={handleGoalDetails}
+            android_ripple={{ color: '#cccccc' }}
+            style={({ pressed }) => [
+                styles.textContainer,
+                pressed && styles.pressedItem
+            ]}
+        >
             <Text style={styles.textStyle}>{goal.text}</Text>
             <TouchableOpacity style={styles.buttonContainer} onPress={() => handleDelete(goal.id)}>
                 <Text style={styles.buttonText}>X</Text>
@@ -15,10 +22,10 @@ const GoalItem = ({ goal, handleDelete, navigation }) => {
             <TouchableOpacity style={styles.infoButton} onPress={handleGoalDetails}>
                 <Text style={styles.infoButtonText}>i</Text>
             </TouchableOpacity>
-        </View>
+
+        </Pressable>
     );
 };
-
 
 
 const styles = StyleSheet.create({
