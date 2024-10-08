@@ -3,27 +3,29 @@ import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-nativ
 
 const GoalItem = ({ goal, handleDelete, navigation }) => {
 
+    const RippleConfig = {
+        color: 'lightblue',
+        borderless: false,
+    }
     const handleGoalDetails = () => {
         navigation.navigate('GoalDetails', { goal });
     }
     return (
-        <Pressable
-            onPress={handleGoalDetails}
-            android_ripple={{ color: '#cccccc' }}
-            style={({ pressed }) => [
-                styles.textContainer,
-                pressed && styles.pressedItem
-            ]}
-        >
-            <Text style={styles.textStyle}>{goal.text}</Text>
-            <TouchableOpacity style={styles.buttonContainer} onPress={() => handleDelete(goal.id)}>
-                <Text style={styles.buttonText}>X</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.infoButton} onPress={handleGoalDetails}>
-                <Text style={styles.infoButtonText}>i</Text>
-            </TouchableOpacity>
-
-        </Pressable>
+        <View style={styles.textContainer}>
+            <Pressable
+                onPress={handleGoalDetails}
+                android_ripple={RippleConfig}
+                style={({ pressed }) => [
+                    styles.horizontal,
+                    pressed && styles.pressedItem
+                ]}
+            >
+                <Text style={styles.textStyle}>{goal.text}</Text>
+                <TouchableOpacity style={styles.buttonContainer} onPress={() => handleDelete(goal.id)}>
+                    <Text style={styles.buttonText}>X</Text>
+                </TouchableOpacity>
+            </Pressable>
+        </View>
     );
 };
 
@@ -62,6 +64,16 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+    horizontal: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    pressedItem: {
+        opacity: 0.5,
+        backgroundColor: '#ccc',
+        borderColor: '#000',
+    }
 });
 
 export default GoalItem;
