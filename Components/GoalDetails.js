@@ -86,6 +86,8 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         marginTop: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     warningText: {
         color: 'red',
