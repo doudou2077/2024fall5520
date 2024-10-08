@@ -1,15 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import PressableButton from './PressableButton';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const GoalItem = ({ goal, handleDelete, navigation }) => {
 
     const RippleConfig = {
-        color: 'lightblue',
+        color: 'Red',
         borderless: false,
+        radius: 1000,
     }
     const handleGoalDetails = () => {
         navigation.navigate('GoalDetails', { goal });
     }
+
     return (
         <View style={styles.textContainer}>
             <Pressable
@@ -21,9 +25,12 @@ const GoalItem = ({ goal, handleDelete, navigation }) => {
                 ]}
             >
                 <Text style={styles.textStyle}>{goal.text}</Text>
-                <TouchableOpacity style={styles.buttonContainer} onPress={() => handleDelete(goal.id)}>
-                    <Text style={styles.buttonText}>X</Text>
-                </TouchableOpacity>
+                <PressableButton
+                    Component style={styles.deleteButton}
+                    Pressed handler={handleDelete}
+                    Pressdstyle={styles.pressedStyle} >
+                    <MaterialCommunityIcons name="delete-outline" size={24} color="white" />
+                </PressableButton>
             </Pressable>
         </View>
     );
@@ -71,9 +78,22 @@ const styles = StyleSheet.create({
     },
     pressedItem: {
         opacity: 0.5,
-        backgroundColor: '#ccc',
+        backgroundColor: 'lightblue',
         borderColor: '#000',
-    }
+    },
+
+    goalItemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        marginVertical: 10,
+        backgroundColor: '#e9ecef',
+        borderRadius: 5,
+    },
+    goalText: {
+        fontSize: 16,
+        backgroundColor: '#d3d3d3',
+    },
 });
 
 export default GoalItem;
