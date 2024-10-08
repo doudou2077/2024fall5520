@@ -1,55 +1,65 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import PressableButton from './PressableButton';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-const GoalItem = ({ goal, handleDelete, onPressDetails }) => {
+const GoalItem = ({ goal, onDelete, navigation }) => {
+    const handleGoalDetails = () => {
+        navigation.navigate('GoalDetails', { goal });
+    }
+
+    const handleDelete = () => {
+        onDelete(goal.id);
+    }
+
     return (
         <View style={styles.textContainer}>
-            <Text style={styles.textStyle}>{goal.text}</Text>
-            <TouchableOpacity style={styles.buttonContainer} onPress={() => handleDelete(goal.id)}>
-                <Text style={styles.buttonText}>X</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.infoButton} onPress={() => onPressDetails(goal)}>
-                <Text style={styles.infoButtonText}>i</Text>
-            </TouchableOpacity>
+            <PressableButton
+                onPress={handleGoalDetails}
+                style={styles.goalButton}
+                pressedStyle={styles.pressedGoalButton}
+            >
+                <Text style={styles.textStyle}>{goal.text}</Text>
+            </PressableButton>
+            <PressableButton
+                style={styles.deleteButton}
+                onPress={handleDelete}
+                pressedStyle={styles.pressedDeleteButton}
+            >
+                <MaterialCommunityIcons name="delete-outline" size={24} color="white" />
+            </PressableButton>
         </View>
     );
 };
 
-
-
 const styles = StyleSheet.create({
-    textStyle: {
-        fontSize: 20,
-        color: 'darkmagenta',
-    },
     textContainer: {
         flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: "#aaa",
         padding: 10,
         marginVertical: 10,
         borderRadius: 5,
-        alignSelf: 'center',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
-    buttonContainer: {
-        paddingHorizontal: 10,
+    goalButton: {
+        flex: 1,
+        padding: 10,
+    },
+    pressedGoalButton: {
+        opacity: 0.7,
+    },
+    textStyle: {
+        fontSize: 20,
+        color: 'darkmagenta',
+    },
+    deleteButton: {
+        backgroundColor: 'red',
+        padding: 5,
         borderRadius: 5,
-    },
-    buttonText: {
-        color: 'white',
-    },
-    infoButton: {
         marginLeft: 10,
-        borderRadius: 15,
-        width: 30,
-        height: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
-    infoButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
+    pressedDeleteButton: {
+        backgroundColor: 'transparent',
     },
 });
 

@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Button, FlatList, Text } from 'react-native';
+import { StyleSheet, View, Button, FlatList, Text, Alert } from 'react-native';
+import PressableButton from './PressableButton';
 import Header from './Header';
 import Input from './Input';
 import GoalItem from './GoalItem';
@@ -32,8 +33,8 @@ export default function Home({ navigation }) {
     const renderItem = ({ item }) => (
         <GoalItem
             goal={item}
-            handleDelete={handleDelete}
-            onPressDetails={handleGoalDetails}
+            onDelete={handleDelete}
+            navigation={navigation}
         />
     );
 
@@ -80,19 +81,17 @@ export default function Home({ navigation }) {
         return <View style={styles.separator} />;
     };
 
-    const handleGoalDetails = (goal) => {
-        navigation.navigate('GoalDetails', { goal });
-    };
-
     return (
         <>
             <View style={styles.topContainer}>
                 <Header name={appName} />
-                <Button
-                    title="Add a Goal"
+                <PressableButton
                     onPress={() => setIsModalVisible(true)}
                     style={styles.button}
-                />
+                    textStyle={styles.buttonText}
+                >
+                    Add a Goal
+                </PressableButton>
             </View>
 
             <View style={styles.bottomContainer}>
@@ -143,8 +142,9 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     button: {
-        width: '60%',
+        width: '30%',
         margin: 10,
+        backgroundColor: '#333333',
     },
     goalItemContainer: {
         flexDirection: 'row',
@@ -198,6 +198,11 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgb(90,90,90)',
     },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
 
 });
 

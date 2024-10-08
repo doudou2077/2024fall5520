@@ -6,7 +6,6 @@ export default function Header({ name }) {
         <View style={
             {
                 padding: 20,
-                backgroundColor: 'rgba(0,0,0,0.1)',
                 alignItems: 'center',
                 borderRadius: 5,
             }
