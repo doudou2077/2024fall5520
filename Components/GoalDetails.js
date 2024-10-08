@@ -1,5 +1,7 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import PressableButton from './PressableButton';
 
 const GoalDetails = ({ route, navigation }) => {
     const { goal } = route.params;
@@ -13,11 +15,17 @@ const GoalDetails = ({ route, navigation }) => {
                     ? (route.params.goalText || 'More Details')
                     : (goal && goal.text ? goal.text : 'Goal Details')),
             headerRight: () => (
-                <Button
+                <PressableButton
                     onPress={() => setIsWarning(!isWarning)}
-                    title="Warning"
-                    color="#000"
-                />
+                    style={styles.headerButton}
+                    pressedStyle={styles.headerButtonPressed}
+                >
+                    <Ionicons
+                        name={isWarning ? "warning" : "warning-outline"}
+                        size={24}
+                        color={isWarning ? "red" : "black"}
+                    />
+                </PressableButton>
             ),
         });
     }, [navigation, isWarning, goal, route.params]);
@@ -43,10 +51,13 @@ const GoalDetails = ({ route, navigation }) => {
             <Text style={[styles.goalText, isWarning && styles.warningText]}>Goal: {goal.text}</Text>
             <Text style={[styles.goalId, isWarning && styles.warningText]}>Goal ID: {goal.id}</Text>
             <View style={styles.buttonContainer}>
-                <Button
-                    title="More Details"
+                <PressableButton
                     onPress={handleMoreDetails}
-                />
+                    style={styles.moreDetailsButton}
+                    textStyle={styles.moreDetailsButtonText}
+                >
+                    More Details
+                </PressableButton>
             </View>
         </View>
     );
@@ -78,6 +89,21 @@ const styles = StyleSheet.create({
     },
     warningText: {
         color: 'red',
+    },
+    headerButton: {
+        padding: 10,
+    },
+    headerButtonPressed: {
+        opacity: 0.7,
+    },
+    moreDetailsButton: {
+        backgroundColor: '#007AFF',
+        padding: 10,
+        borderRadius: 5,
+    },
+    moreDetailsButtonText: {
+        color: 'white',
+        fontSize: 16,
     },
 });
 

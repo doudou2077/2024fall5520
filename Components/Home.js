@@ -33,7 +33,7 @@ export default function Home({ navigation }) {
     const renderItem = ({ item }) => (
         <GoalItem
             goal={item}
-            handleDelete={handleDelete}
+            onDelete={handleDelete}
             navigation={navigation}
         />
     );
