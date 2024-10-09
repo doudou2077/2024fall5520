@@ -127,7 +127,9 @@ export default function Home({ navigation }) {
                     ListEmptyComponent={EmptyListComponent}
                     ListHeaderComponent={goals.length > 0 ? ListHeader : null}
                     ListFooterComponent={goals.length > 0 ? <ListFooter onPressDeleteAll={handleDeleteAll} /> : null}
-                    ItemSeparatorComponent={ItemSeparator}
+                    ItemSeparatorComponent={({ highlighted }) => (
+                        <ItemSeparator highlighted={highlighted} />
+                    )}
                 />
 
             </View>
