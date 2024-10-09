@@ -9,6 +9,8 @@ export default function Home({ navigation }) {
     const appName = "My App";
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [goals, setGoals] = useState([]);
+    const [highlightedId, setHighlightedId] = useState(null);
+
 
     const closeModal = useCallback(() => {
         Alert.alert(
@@ -30,24 +32,40 @@ export default function Home({ navigation }) {
         setIsModalVisible(false);
     };
 
+
+
+
+
+
+
     const renderItem = ({ item, separators }) => (
         <GoalItem
             goal={item}
             onDelete={handleDelete}
             navigation={navigation}
-            onPressIn={() => separators.highlight()}
-            onPressOut={() => separators.unhighlight()}
+            onPressIn={() => {
+                console.log('onPressIn called for item:', item.id);
+                separators.highlight();
+            }}
+            onPressOut={() => {
+                console.log('onPressOut called for item:', item.id);
+                separators.unhighlight();
+            }}
         />
     );
 
+
     const ItemSeparator = ({ highlighted }) => {
+        console.log('Separator highlighted:', highlighted);
         return (
             <View style={[
                 styles.separator,
-                highlighted && { borderColor: 'blue' }
+                highlighted && styles.highlightedSeparator
             ]} />
         );
     };
+
+
 
     const handleDelete = (goalId) => {
         console.log("Deleting goal with id:", goalId);
@@ -111,6 +129,7 @@ export default function Home({ navigation }) {
                     ListFooterComponent={goals.length > 0 ? <ListFooter onPressDeleteAll={handleDeleteAll} /> : null}
                     ItemSeparatorComponent={ItemSeparator}
                 />
+
             </View>
 
             <Input
@@ -128,7 +147,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-
     textStyle: {
         fontSize: 20,
         color: 'red',
@@ -168,7 +186,6 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         paddingVertical: 20,
     },
-
     emptyContainer: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -201,7 +218,7 @@ const styles = StyleSheet.create({
     separator: {
         height: 2,
         width: '100%',
-        borderWidth: 1,
+        borderWidth: 2,
         borderColor: 'rgb(90,90,90)',
     },
     buttonText: {
@@ -209,11 +226,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    separator: {
-        height: 2,
-        width: '100%',
-        borderWidth: 1,
-        borderColor: 'rgb(90,90,90)',
+    highlightedSeparator: {
+        backgroundColor: 'red',
     },
 });
-
