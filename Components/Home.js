@@ -30,13 +30,24 @@ export default function Home({ navigation }) {
         setIsModalVisible(false);
     };
 
-    const renderItem = ({ item }) => (
+    const renderItem = ({ item, separators }) => (
         <GoalItem
             goal={item}
             onDelete={handleDelete}
             navigation={navigation}
+            onPressIn={() => separators.highlight()}
+            onPressOut={() => separators.unhighlight()}
         />
     );
+
+    const ItemSeparator = ({ highlighted }) => {
+        return (
+            <View style={[
+                styles.separator,
+                highlighted && { borderColor: 'blue' }
+            ]} />
+        );
+    };
 
     const handleDelete = (goalId) => {
         console.log("Deleting goal with id:", goalId);
@@ -75,11 +86,6 @@ export default function Home({ navigation }) {
             />
         </View>
     );
-
-    const ItemSeparator = () => {
-        console.log("Rendering Separator");
-        return <View style={styles.separator} />;
-    };
 
     return (
         <>
@@ -202,7 +208,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
-    }
-
+    },
 });
 
