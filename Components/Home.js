@@ -217,18 +217,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
     },
-    separator: {
-        height: 2,
-        width: '100%',
-        borderWidth: 2,
-        borderColor: 'rgb(90,90,90)',
-    },
     buttonText: {
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
     },
-    highlightedSeparator: {
-        backgroundColor: 'red',
+    separator: {
+        height: 2,
+        width: '100%',
+        borderWidth: 2,
+        borderColor: 'rgba(0,0,0,0.2)',
     },
+    highlightedSeparator: {
+        height: 2,
+        width: '100%',
+        borderWidth: 2,
+        borderColor: 'red',
+    },
+
 });
