@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { Text, StyleSheet, Alert } from 'react-native';
 import PressableButton from './PressableButton';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     },
     pressedGoalButton: {
         opacity: 0.7,
+        backgroundColor: '#e0e0e0',
     },
     textStyle: {
         flex: 1,
