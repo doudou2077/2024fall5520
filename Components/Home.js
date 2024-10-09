@@ -9,7 +9,6 @@ export default function Home({ navigation }) {
     const appName = "My App";
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [goals, setGoals] = useState([]);
-    const [highlightedId, setHighlightedId] = useState(null);
 
 
     const closeModal = useCallback(() => {
@@ -31,11 +30,6 @@ export default function Home({ navigation }) {
         setGoals(currentGoals => [...currentGoals, newGoal]);
         setIsModalVisible(false);
     };
-
-
-
-
-
 
 
     const renderItem = ({ item, separators }) => (
@@ -171,6 +165,7 @@ const styles = StyleSheet.create({
         width: '30%',
         margin: 10,
         backgroundColor: '#333333',
+        borderRadius: 10
     },
     goalItemContainer: {
         flexDirection: 'row',
