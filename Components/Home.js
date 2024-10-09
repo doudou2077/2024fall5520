@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Button, FlatList, Text } from 'react-native';
+import { StyleSheet, View, Button, FlatList, Text, Alert } from 'react-native';
+import PressableButton from './PressableButton';
 import Header from './Header';
 import Input from './Input';
 import GoalItem from './GoalItem';
@@ -8,6 +9,7 @@ export default function Home({ navigation }) {
     const appName = "My App";
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [goals, setGoals] = useState([]);
+
 
     const closeModal = useCallback(() => {
         Alert.alert(
@@ -29,13 +31,35 @@ export default function Home({ navigation }) {
         setIsModalVisible(false);
     };
 
-    const renderItem = ({ item }) => (
+
+    const renderItem = ({ item, separators }) => (
         <GoalItem
             goal={item}
-            handleDelete={handleDelete}
-            onPressDetails={handleGoalDetails}
+            onDelete={handleDelete}
+            navigation={navigation}
+            onPressIn={() => {
+                console.log('onPressIn called for item:', item.id);
+                separators.highlight();
+            }}
+            onPressOut={() => {
+                console.log('onPressOut called for item:', item.id);
+                separators.unhighlight();
+            }}
         />
     );
+
+
+    const ItemSeparator = ({ highlighted }) => {
+        console.log('Separator highlighted:', highlighted);
+        return (
+            <View style={[
+                styles.separator,
+                highlighted && styles.highlightedSeparator
+            ]} />
+        );
+    };
+
+
 
     const handleDelete = (goalId) => {
         console.log("Deleting goal with id:", goalId);
@@ -75,24 +99,17 @@ export default function Home({ navigation }) {
         </View>
     );
 
-    const ItemSeparator = () => {
-        console.log("Rendering Separator");
-        return <View style={styles.separator} />;
-    };
-
-    const handleGoalDetails = (goal) => {
-        navigation.navigate('GoalDetails', { goal });
-    };
-
     return (
         <>
             <View style={styles.topContainer}>
                 <Header name={appName} />
-                <Button
-                    title="Add a Goal"
+                <PressableButton
                     onPress={() => setIsModalVisible(true)}
                     style={styles.button}
-                />
+                    textStyle={styles.buttonText}
+                >
+                    Add a Goal
+                </PressableButton>
             </View>
 
             <View style={styles.bottomContainer}>
@@ -104,8 +121,11 @@ export default function Home({ navigation }) {
                     ListEmptyComponent={EmptyListComponent}
                     ListHeaderComponent={goals.length > 0 ? ListHeader : null}
                     ListFooterComponent={goals.length > 0 ? <ListFooter onPressDeleteAll={handleDeleteAll} /> : null}
-                    ItemSeparatorComponent={ItemSeparator}
+                    ItemSeparatorComponent={({ highlighted }) => (
+                        <ItemSeparator highlighted={highlighted} />
+                    )}
                 />
+
             </View>
 
             <Input
@@ -123,7 +143,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-
     textStyle: {
         fontSize: 20,
         color: 'red',
@@ -143,8 +162,10 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     button: {
-        width: '60%',
+        width: '30%',
         margin: 10,
+        backgroundColor: '#333333',
+        borderRadius: 10
     },
     goalItemContainer: {
         flexDirection: 'row',
@@ -162,7 +183,6 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         paddingVertical: 20,
     },
-
     emptyContainer: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -192,12 +212,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
     },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
     separator: {
         height: 2,
         width: '100%',
-        borderWidth: 1,
-        borderColor: 'rgb(90,90,90)',
+        borderWidth: 2,
+        borderColor: 'rgba(0,0,0,0.2)',
+    },
+    highlightedSeparator: {
+        height: 2,
+        width: '100%',
+        borderWidth: 2,
+        borderColor: 'red',
     },
 
 });
-
