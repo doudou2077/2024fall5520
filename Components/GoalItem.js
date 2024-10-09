@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Alert } from 'react-native';
 import PressableButton from './PressableButton';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-const GoalItem = ({ goal, onDelete, navigation }) => {
+const GoalItem = ({ goal, onDelete, navigation, onPressIn, onPressOut }) => {
     const handleGoalDetails = () => {
         navigation.navigate('GoalDetails', { goal });
     }
@@ -23,6 +23,8 @@ const GoalItem = ({ goal, onDelete, navigation }) => {
         <PressableButton
             onPress={handleGoalDetails}
             onLongPress={handleDelete}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
             style={styles.textContainer}
             pressedStyle={styles.pressedGoalButton}
         >
