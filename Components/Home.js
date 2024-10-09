@@ -209,5 +209,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    separator: {
+        height: 2,
+        width: '100%',
+        borderWidth: 1,
+        borderColor: 'rgb(90,90,90)',
+    },
 });
 
