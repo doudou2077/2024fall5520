@@ -1,13 +1,41 @@
-import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Button, FlatList, Text } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { StyleSheet, View, Button, FlatList, Text, Alert } from 'react-native';
+import PressableButton from './PressableButton';
 import Header from './Header';
 import Input from './Input';
 import GoalItem from './GoalItem';
+import { database } from '../Firebase/FirebaseSetup';
+import { writeToDB, deleteFromDB, deleteAllFromDB } from '../Firebase/FirebaseHelper';
+import { collection, onSnapshot } from 'firebase/firestore';
+
 
 export default function Home({ navigation }) {
+    console.log(database);
     const appName = "My App";
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [goals, setGoals] = useState([]);
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(collection(database, 'goals'),
+            (querySnapshot) => {
+                let newArray = [];
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((docSnapshot) => {
+                        newArray.push({
+                            ...docSnapshot.data(),// Spread all fields from the document
+                            id: docSnapshot.id // Add the id as a separate field
+                        });
+                    });
+                }
+                setGoals(newArray);
+            },
+            (error) => {
+                console.error("Error listening to goals collection:", error);
+            }
+        );
+
+        return () => unsubscribe();
+    }, []);
 
     const closeModal = useCallback(() => {
         Alert.alert(
@@ -20,27 +48,55 @@ export default function Home({ navigation }) {
         );
     }, []);
 
-    const handleInputData = (text) => {
-        const newGoal = {
-            id: Math.floor(Math.random() * 10000).toString(),
-            text: text,
-        };
-        setGoals(currentGoals => [...currentGoals, newGoal]);
-        setIsModalVisible(false);
-    };
+    async function handleInputData(text) {
+        const newGoal = { text: text };
+        try {
+            await writeToDB(newGoal, "goals");
+            setIsModalVisible(false);
+        } catch (error) {
+            console.error("Error adding goal:", error);
+        }
+    }
 
-    const renderItem = ({ item }) => (
+
+    const renderItem = ({ item, separators }) => (
         <GoalItem
             goal={item}
-            handleDelete={handleDelete}
-            onPressDetails={handleGoalDetails}
+            onDelete={handleDelete}
+            navigation={navigation}
+            onPressIn={() => {
+                console.log('onPressIn called for item:', item.id);
+                separators.highlight();
+            }}
+            onPressOut={() => {
+                console.log('onPressOut called for item:', item.id);
+                separators.unhighlight();
+            }}
         />
     );
 
-    const handleDelete = (goalId) => {
-        console.log("Deleting goal with id:", goalId);
-        setGoals(currentGoals => currentGoals.filter(goal => goal.id !== goalId));
-    }
+
+    const ItemSeparator = ({ highlighted }) => {
+        console.log('Separator highlighted:', highlighted);
+        return (
+            <View style={[
+                styles.separator,
+                highlighted && styles.highlightedSeparator
+            ]} />
+        );
+    };
+
+
+
+    const handleDelete = async (goalId) => {
+        try {
+            await deleteFromDB(goalId, "goals");
+            console.log("Goal deleted successfully with ID:", goalId);
+        } catch (error) {
+            console.error("Error deleting goal:", error);
+            Alert.alert("Error", "Failed to delete goal. Please try again.");
+        }
+    };
 
     const EmptyListComponent = () => (
         <View style={styles.emptyContainer}>
@@ -60,7 +116,19 @@ export default function Home({ navigation }) {
             "Are you sure you want to delete all goals?",
             [
                 { text: "No", style: "cancel" },
-                { text: "Yes", onPress: () => setGoals([]) }
+                {
+                    text: "Yes",
+                    onPress: async () => {
+                        try {
+                            await deleteAllFromDB('goals');
+                            console.log("All goals deleted successfully");
+
+                        } catch (error) {
+                            console.error("Error deleting all goals:", error);
+                            Alert.alert("Error", "Failed to delete all goals. Please try again.");
+                        }
+                    }
+                }
             ]
         );
     };
@@ -75,24 +143,17 @@ export default function Home({ navigation }) {
         </View>
     );
 
-    const ItemSeparator = () => {
-        console.log("Rendering Separator");
-        return <View style={styles.separator} />;
-    };
-
-    const handleGoalDetails = (goal) => {
-        navigation.navigate('GoalDetails', { goal });
-    };
-
     return (
         <>
             <View style={styles.topContainer}>
                 <Header name={appName} />
-                <Button
-                    title="Add a Goal"
+                <PressableButton
                     onPress={() => setIsModalVisible(true)}
                     style={styles.button}
-                />
+                    textStyle={styles.buttonText}
+                >
+                    Add a Goal
+                </PressableButton>
             </View>
 
             <View style={styles.bottomContainer}>
@@ -104,8 +165,11 @@ export default function Home({ navigation }) {
                     ListEmptyComponent={EmptyListComponent}
                     ListHeaderComponent={goals.length > 0 ? ListHeader : null}
                     ListFooterComponent={goals.length > 0 ? <ListFooter onPressDeleteAll={handleDeleteAll} /> : null}
-                    ItemSeparatorComponent={ItemSeparator}
+                    ItemSeparatorComponent={({ highlighted }) => (
+                        <ItemSeparator highlighted={highlighted} />
+                    )}
                 />
+
             </View>
 
             <Input
@@ -123,7 +187,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-
     textStyle: {
         fontSize: 20,
         color: 'red',
@@ -143,8 +206,10 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     button: {
-        width: '60%',
+        width: '30%',
         margin: 10,
+        backgroundColor: '#333333',
+        borderRadius: 10
     },
     goalItemContainer: {
         flexDirection: 'row',
@@ -162,7 +227,6 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         paddingVertical: 20,
     },
-
     emptyContainer: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -192,12 +256,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
     },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
     separator: {
         height: 2,
         width: '100%',
-        borderWidth: 1,
-        borderColor: 'rgb(90,90,90)',
+        borderWidth: 2,
+        borderColor: 'rgba(0,0,0,0.2)',
+    },
+    highlightedSeparator: {
+        height: 2,
+        width: '100%',
+        borderWidth: 2,
+        borderColor: 'red',
     },
 
 });
-
