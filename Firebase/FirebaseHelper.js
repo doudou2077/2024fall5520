@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, deleteDoc } from "firebase/firestore";
+import { addDoc, collection, doc, deleteDoc, getDocs } from "firebase/firestore";
 import { database } from "./FirebaseSetup";
 
 
@@ -18,5 +18,18 @@ export async function deleteFromDB(id, collectionName = 'goals') {
     }
     catch (err) {
         console.log(err)
+    }
+}
+
+
+export async function deleteAllFromDB(collectionName = 'goals') {
+    try {
+        const querySnapshot = await getDocs(collection(database, collectionName));
+        const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
+        await Promise.all(deletePromises);
+        console.log('All documents deleted from collection:', collectionName);
+    } catch (error) {
+        console.error('Error deleting all documents:', error);
+        throw error;
     }
 }
