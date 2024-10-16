@@ -6,7 +6,7 @@ import { updateWarningStatus } from '../Firebase/FirebaseHelper';
 
 const GoalDetails = ({ route, navigation }) => {
     const { goal } = route.params;
-    const [isWarning, setIsWarning] = useState(false);
+    const [isWarning, setIsWarning] = useState(goal.warning || false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
