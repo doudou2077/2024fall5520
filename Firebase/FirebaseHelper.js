@@ -33,3 +33,13 @@ export async function deleteAllFromDB(collectionName = 'goals') {
         throw error;
     }
 }
+
+export async function updateWarningStatus(id, collectionName = 'goals', warningStatus) {
+    try {
+        const docRef = doc(database, collectionName, id);
+        await updateDoc(docRef, { warning: warningStatus });
+        console.log('Warning status:', warningStatus);
+    } catch (err) {
+        console.error('Error updating document', err);
+    }
+}
