@@ -1,7 +1,8 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import PressableButton from './PressableButton';
+import { updateWarningStatus } from '../Firebase/FirebaseHelper';
 
 const GoalDetails = ({ route, navigation }) => {
     const { goal } = route.params;
@@ -33,7 +34,7 @@ const GoalDetails = ({ route, navigation }) => {
     const handleWarningToggle = async () => {
         try {
             const newWarningStatus = !isWarning;
-            await updateGoalWarning(goal.id, newWarningStatus);
+            await updateWarningStatus(goal.id, newWarningStatus);
             setIsWarning(newWarningStatus);
         } catch (error) {
             console.error('Error toggling warning status:', error);
