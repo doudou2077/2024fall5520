@@ -16,7 +16,7 @@ const GoalDetails = ({ route, navigation }) => {
                     : (goal && goal.text ? goal.text : 'Goal Details')),
             headerRight: () => (
                 <PressableButton
-                    onPress={() => setIsWarning(!isWarning)}
+                    onPress={handleWarningToggle}
                     style={styles.headerButton}
                     pressedStyle={styles.headerButtonPressed}
                 >
