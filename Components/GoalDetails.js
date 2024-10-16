@@ -30,6 +30,16 @@ const GoalDetails = ({ route, navigation }) => {
         });
     }, [navigation, isWarning, goal, route.params]);
 
+    const handleWarningToggle = async () => {
+        try {
+            const newWarningStatus = !isWarning;
+            await updateGoalWarning(goal.id, newWarningStatus);
+            setIsWarning(newWarningStatus);
+        } catch (error) {
+            console.error('Error toggling warning status:', error);
+            Alert.alert('Error', 'Failed to update warning status. Please try again.');
+        }
+    }
     const handleMoreDetails = () => {
         navigation.push('GoalDetails', {
             moreDetails: "More Details",
