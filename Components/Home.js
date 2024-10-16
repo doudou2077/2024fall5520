@@ -16,6 +16,7 @@ export default function Home({ navigation }) {
     const [goals, setGoals] = useState([]);
 
     useEffect(() => {
+        console.log('Setting up Firestore listener');
         const unsubscribe = onSnapshot(collection(database, 'goals'),
             (querySnapshot) => {
                 let newArray = [];
@@ -34,7 +35,12 @@ export default function Home({ navigation }) {
             }
         );
 
-        return () => unsubscribe();
+        // Cleanup function to detach the listener
+        return () => {
+            console.log('Detaching Firestore listener');
+            unsubscribe();
+        };
+
     }, []);
 
     const closeModal = useCallback(() => {
