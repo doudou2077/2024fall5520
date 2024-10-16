@@ -34,7 +34,7 @@ const GoalDetails = ({ route, navigation }) => {
     const handleWarningToggle = async () => {
         try {
             const newWarningStatus = !isWarning;
-            await updateWarningStatus(goal.id, newWarningStatus);
+            await updateWarningStatus(goal.id, 'goals', newWarningStatus);
             setIsWarning(newWarningStatus);
         } catch (error) {
             console.error('Error toggling warning status:', error);
