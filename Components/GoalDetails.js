@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import PressableButton from './PressableButton';
 import { updateWarningStatus } from '../Firebase/FirebaseHelper';
+import GoalUsers from './GoalUsers';
+
 
 const GoalDetails = ({ route, navigation }) => {
     const { goal } = route.params;
@@ -70,6 +72,7 @@ const GoalDetails = ({ route, navigation }) => {
                     More Details
                 </PressableButton>
             </View>
+            <GoalUsers goalId={goal.id} />
         </View>
     );
 };
@@ -84,7 +87,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 200,
     },
     goalText: {
         fontSize: 18,
