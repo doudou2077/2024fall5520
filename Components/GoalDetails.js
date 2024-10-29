@@ -1,11 +1,14 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import PressableButton from './PressableButton';
+import { updateWarningStatus } from '../Firebase/FirebaseHelper';
+import GoalUsers from './GoalUsers';
+
 
 const GoalDetails = ({ route, navigation }) => {
     const { goal } = route.params;
-    const [isWarning, setIsWarning] = useState(false);
+    const [isWarning, setIsWarning] = useState(goal.warning || false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -16,7 +19,7 @@ const GoalDetails = ({ route, navigation }) => {
                     : (goal && goal.text ? goal.text : 'Goal Details')),
             headerRight: () => (
                 <PressableButton
-                    onPress={() => setIsWarning(!isWarning)}
+                    onPress={handleWarningToggle}
                     style={styles.headerButton}
                     pressedStyle={styles.headerButtonPressed}
                 >
@@ -30,6 +33,16 @@ const GoalDetails = ({ route, navigation }) => {
         });
     }, [navigation, isWarning, goal, route.params]);
 
+    const handleWarningToggle = async () => {
+        try {
+            const newWarningStatus = !isWarning;
+            await updateWarningStatus(goal.id, 'goals', newWarningStatus);
+            setIsWarning(newWarningStatus);
+        } catch (error) {
+            console.error('Error toggling warning status:', error);
+            Alert.alert('Error', 'Failed to update warning status. Please try again.');
+        }
+    }
     const handleMoreDetails = () => {
         navigation.push('GoalDetails', {
             moreDetails: "More Details",
@@ -59,6 +72,7 @@ const GoalDetails = ({ route, navigation }) => {
                     More Details
                 </PressableButton>
             </View>
+            <GoalUsers goalId={goal.id} />
         </View>
     );
 };
@@ -73,7 +87,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 200,
     },
     goalText: {
         fontSize: 18,
