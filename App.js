@@ -66,13 +66,14 @@ const AppStack = (
       })}
     />
     <Stack.Screen
-      name="Details"
+      name="GoalDetails"  // Changed from "Details" to "GoalDetails"
       component={GoalDetails}
       options={({ route }) => ({
-        title: route.params.goal && route.params.goal.text,
+        title: route.params?.goal?.text || 'Goal Details',
         headerBackTitle: 'Back',
       })}
     />
+
     <Stack.Screen
       name="Profile"
       component={Profile}

@@ -1,9 +1,11 @@
-import { View, Text, FlatList } from 'react-native'
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { writeToDB, readAllDocs } from '../Firebase/FirebaseHelper'
 
 const GoalUsers = ({ goalId }) => {
     const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -37,7 +39,10 @@ const GoalUsers = ({ goalId }) => {
                 }
             } catch (error) {
                 console.error('Error fetching users:', error);
-                setUsers([{ id: 'error', name: `Error: ${error.message}` }]);
+                setError(error.message);
+                setUsers([]);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -45,18 +50,80 @@ const GoalUsers = ({ goalId }) => {
     }, [goalId]);
 
     const renderItem = ({ item }) => (
-        <Text>{item.name}</Text>
-    )
+        <View style={styles.userItem}>
+            <Text style={styles.userName}>{item.name}</Text>
+        </View>
+    );
+
+    if (loading) {
+        return (
+            <View style={styles.centerContainer}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.centerContainer}>
+                <Text style={styles.errorText}>Error: {error}</Text>
+            </View>
+        );
+    }
 
     return (
-        <View>
+        <View style={styles.container}>
+            <Text style={styles.title}>Associated Users:</Text>
             <FlatList
                 data={users}
                 renderItem={renderItem}
                 keyExtractor={item => item.id.toString()}
+                ListEmptyComponent={
+                    <Text style={styles.emptyText}>No users found</Text>
+                }
+                contentContainerStyle={styles.listContainer}
             />
         </View>
-    )
+    );
 }
 
-export default GoalUsers
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 10,
+        width: '100%',
+    },
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    userItem: {
+        padding: 10,
+        backgroundColor: '#f5f5f5',
+        marginVertical: 5,
+        borderRadius: 5,
+    },
+    userName: {
+        fontSize: 16,
+    },
+    errorText: {
+        color: 'red',
+        textAlign: 'center',
+    },
+    emptyText: {
+        textAlign: 'center',
+        color: 'gray',
+        marginTop: 20,
+    },
+    listContainer: {
+        flexGrow: 1,
+    },
+});
+
+export default GoalUsers;
