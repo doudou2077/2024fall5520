@@ -6,7 +6,10 @@ import Input from './Input';
 import GoalItem from './GoalItem';
 import { database } from '../Firebase/FirebaseSetup';
 import { writeToDB, deleteFromDB, deleteAllFromDB } from '../Firebase/FirebaseHelper';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { storage } from '../Firebase/FirebaseSetup';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
 
 
 export default function Home({ navigation }) {
@@ -15,16 +18,34 @@ export default function Home({ navigation }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [goals, setGoals] = useState([]);
 
+    const auth = getAuth();
+
+
     useEffect(() => {
         console.log('Setting up Firestore listener');
-        const unsubscribe = onSnapshot(collection(database, 'goals'),
+
+        // Check authentication
+        if (!auth.currentUser) {
+            console.log('No authenticated user');
+            navigation.replace('Login');
+            return;
+        }
+
+        // Query only user's own goals
+        const q = query(
+            collection(database, 'goals'),
+            where("owner", "==", auth.currentUser.uid)
+        );
+
+        const unsubscribe = onSnapshot(
+            q,  // Use query instead of collection reference
             (querySnapshot) => {
                 let newArray = [];
                 if (!querySnapshot.empty) {
                     querySnapshot.forEach((docSnapshot) => {
                         newArray.push({
-                            ...docSnapshot.data(),// Spread all fields from the document
-                            id: docSnapshot.id // Add the id as a separate field
+                            ...docSnapshot.data(),
+                            id: docSnapshot.id
                         });
                     });
                 }
@@ -32,16 +53,14 @@ export default function Home({ navigation }) {
             },
             (error) => {
                 console.error("Error listening to goals collection:", error);
+                if (error.code === 'permission-denied') {
+                    Alert.alert('Error', 'You do not have permission to access these goals');
+                }
             }
         );
 
-        // Cleanup function to detach the listener
-        return () => {
-            console.log('Detaching Firestore listener');
-            unsubscribe();
-        };
-
-    }, []);
+        return () => unsubscribe();
+    }, [auth.currentUser]);
 
     const closeModal = useCallback(() => {
         Alert.alert(
@@ -54,16 +73,49 @@ export default function Home({ navigation }) {
         );
     }, []);
 
-    async function handleInputData(text) {
-        const newGoal = { text: text };
+    async function handleInputData(data) {
         try {
+            let imageUri = null;
+
+            // If there's an image, upload it to Firebase Storage first
+            if (data.imageUri) {
+                try {
+                    // Get the image data as a blob
+                    const response = await fetch(data.imageUri);
+                    const blob = await response.blob();
+
+                    // Create a unique filename using timestamp
+                    const timestamp = new Date().getTime();
+                    const imageName = `${auth.currentUser.uid}_${timestamp}.jpg`;
+                    const imageRef = ref(storage, `images/${imageName}`);
+
+                    // Upload the image
+                    const uploadResult = await uploadBytesResumable(imageRef, blob);
+
+                    // Get the download URL instead of the path
+                    imageUri = await getDownloadURL(imageRef);
+
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                    Alert.alert('Error', 'Failed to upload image. Please try again.');
+                    return;
+                }
+            }
+
+            // Create the goal object with text and image URL
+            const newGoal = {
+                text: data.text,
+                imageUri: imageUri
+            };
+
+            // Save to Firestore
             await writeToDB(newGoal, "goals");
             setIsModalVisible(false);
         } catch (error) {
             console.error("Error adding goal:", error);
+            Alert.alert('Error', 'Failed to save goal. Please try again.');
         }
     }
-
 
     const renderItem = ({ item, separators }) => (
         <GoalItem

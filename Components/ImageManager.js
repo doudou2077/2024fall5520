@@ -1,5 +1,5 @@
-import { View, Button, Platform, Image } from 'react-native'  // Added Image
-import React, { useState } from 'react'  // Added useState
+import { View, Button, Platform, Image, Alert, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function ImageManager({ onImageTaken }) {
@@ -20,7 +20,7 @@ export default function ImageManager({ onImageTaken }) {
       if (Platform.OS === 'ios') {
         const hasPermission = await verifyPermission();
         if (!hasPermission) {
-          alert('You need to enable camera permissions to take photos');
+          Alert.alert('Permission Required', 'You need to enable camera permissions to take photos');
           return;
         }
       }
@@ -44,14 +44,28 @@ export default function ImageManager({ onImageTaken }) {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <Button title="Take Photo" onPress={handleCameraPress} />
       {imageUri && (
         <Image
           source={{ uri: imageUri }}
-          style={{ width: 200, height: 200, marginTop: 10 }}
+          style={styles.preview}
         />
       )}
     </View>
-  )
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  preview: {
+    width: 200,
+    height: 200,
+    marginTop: 10,
+    borderRadius: 10,
+  }
+});

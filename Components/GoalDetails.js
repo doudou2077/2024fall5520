@@ -4,11 +4,34 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import PressableButton from './PressableButton';
 import { updateWarningStatus } from '../Firebase/FirebaseHelper';
 import GoalUsers from './GoalUsers';
-
+import { storage } from '../Firebase/FirebaseSetup';
+import { getDownloadURL, ref } from "firebase/storage";
 
 const GoalDetails = ({ route, navigation }) => {
     const { goal } = route.params;
     const [isWarning, setIsWarning] = useState(goal.warning || false);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        async function loadImage() {
+            if (goal.imageUri) {
+                try {
+                    setLoading(true); // Only proceed if there's an image path
+                    const reference = ref(storage, goal.imageUri);  // Get reference
+                    const url = await getDownloadURL(reference);// Get URL
+                    setImageUrl(url);
+                } catch (error) {
+                    console.error("Error loading image:", error);
+                    Alert.alert("Error", "Failed to load image");
+                } finally {
+                    setLoading(false);
+                }
+            }
+        }
+
+        loadImage();
+    }, [goal.imageUri]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -50,6 +73,8 @@ const GoalDetails = ({ route, navigation }) => {
         });
     };
 
+
+
     if (route.params.moreDetails) {
         return (
             <View style={styles.container}>
@@ -63,6 +88,24 @@ const GoalDetails = ({ route, navigation }) => {
             <Text style={[styles.title, isWarning && styles.warningText]}>Goal Details</Text>
             <Text style={[styles.goalText, isWarning && styles.warningText]}>Goal: {goal.text}</Text>
             <Text style={[styles.goalId, isWarning && styles.warningText]}>Goal ID: {goal.id}</Text>
+
+            {/* Add image display */}
+            {goal.imageUri && (
+                <View style={styles.imageContainer}>
+                    {loading ? (
+                        <Text>Loading image...</Text>
+                    ) : imageUrl ? (
+                        <Image
+                            source={{ uri: imageUrl }}
+                            style={styles.image}
+                            resizeMode="contain"
+                        />
+                    ) : (
+                        <Text>Failed to load image</Text>
+                    )}
+                </View>
+            )}
+
             <View style={styles.buttonContainer}>
                 <PressableButton
                     onPress={handleMoreDetails}
