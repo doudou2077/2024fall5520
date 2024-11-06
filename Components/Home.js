@@ -79,39 +79,58 @@ export default function Home({ navigation }) {
 
             if (data.imageUri) {
                 try {
-                    console.log('Starting image upload process...');
-                    const response = await fetch(data.imageUri);
-                    console.log('Fetch response status:', response.status);
+                    console.log('Starting upload process...');
 
+                    // 1. Fetch and verify blob
+                    const response = await fetch(data.imageUri);
                     const blob = await response.blob();
-                    console.log('Blob created:', {
+                    console.log('Blob details:', {
                         size: blob.size,
                         type: blob.type
                     });
 
-                    // Get original filename from URI
+                    // 2. Verify storage reference
                     const imageName = data.imageUri.substring(data.imageUri.lastIndexOf('/') + 1);
-                    console.log('Image name:', imageName);
-
                     const imageRef = ref(storage, `images/${imageName}`);
-                    console.log('Storage reference created:', imageRef.fullPath);
+                    console.log('Storage reference details:', {
+                        bucket: imageRef.bucket,
+                        fullPath: imageRef.fullPath,
+                        name: imageRef.name
+                    });
 
-                    // Upload with progress monitoring
-                    const uploadResult = await uploadBytesResumable(imageRef, blob);
-                    console.log('Upload completed:', uploadResult);
+                    // 3. Try upload with explicit error handling
+                    console.log('Starting upload...');
+                    const uploadTask = uploadBytesResumable(imageRef, blob);
 
-                    // Get download URL
+                    // Add upload monitoring
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log('Upload progress:', progress + '%');
+                        },
+                        (error) => {
+                            console.error('Upload task error:', {
+                                code: error.code,
+                                message: error.message,
+                                serverResponse: error.serverResponse,
+                                name: error.name
+                            });
+                        }
+                    );
+
+                    const uploadResult = await uploadTask;
+                    console.log('Upload successful:', uploadResult);
+
                     imageUri = await getDownloadURL(uploadResult.ref);
-                    console.log('Download URL:', imageUri);
+                    console.log('Got download URL');
 
-                    // Clean up blob
                     blob.close();
-                    console.log('Blob cleaned up');
-
                 } catch (error) {
-                    console.error('Upload error:', {
-                        message: error.message,
+                    console.error('Upload error details:', {
                         code: error.code,
+                        message: error.message,
+                        serverResponse: error.serverResponse,
+                        name: error.name,
                         stack: error.stack
                     });
                     Alert.alert('Upload Error', error.message);
