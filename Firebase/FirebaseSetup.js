@@ -10,6 +10,11 @@ import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
+// Add this console log to verify config
+console.log('Firebase Config:', {
+    ...firebaseConfig,
+    apiKey: '***hidden***'  // Hide sensitive data
+});
 
 const firebaseConfig = {
     apiKey: process.env.EXPO_PUBLIC_apiKey,
@@ -27,4 +32,15 @@ export const database = getFirestore(app);
 export const auth = initializeAuth(app, {
     persistence: getReactNativePersistence(AsyncStorage)
 });
-export const storage = getStorage(app);
+
+// Add this before initializing storage
+console.log('Firebase config:', {
+    ...firebaseConfig,
+    apiKey: '[HIDDEN]'
+});
+
+// Initialize storage with explicit bucket URL
+export const storage = getStorage(app, `gs://${process.env.EXPO_PUBLIC_storageBucket}`);
+
+// Verify storage initialization
+console.log('Storage initialized:', storage ? 'Yes' : 'No');

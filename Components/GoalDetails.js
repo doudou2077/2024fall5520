@@ -1,5 +1,5 @@
-import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
+import { View, Text, StyleSheet, Alert, Image } from 'react-native';  // Add Image here
 import Ionicons from '@expo/vector-icons/Ionicons';
 import PressableButton from './PressableButton';
 import { updateWarningStatus } from '../Firebase/FirebaseHelper';

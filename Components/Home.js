@@ -13,7 +13,6 @@ import { getAuth } from 'firebase/auth';
 
 
 export default function Home({ navigation }) {
-    console.log(database);
     const appName = "My App";
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [goals, setGoals] = useState([]);
@@ -77,42 +76,77 @@ export default function Home({ navigation }) {
         try {
             let imageUri = null;
 
-            // If there's an image, upload it to Firebase Storage first
             if (data.imageUri) {
                 try {
-                    // Get the image data as a blob
+                    console.log('Starting image upload process...');
+
+                    // Fetch the image
                     const response = await fetch(data.imageUri);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch image: ${response.status}`);
+                    }
+                    console.log('Image fetch response:', response.status);
+
+                    // Create blob
                     const blob = await response.blob();
+                    console.log('Blob created, size:', blob.size, 'bytes');
 
-                    // Create a unique filename using timestamp
+                    // Create unique filename using timestamp only
                     const timestamp = new Date().getTime();
-                    const imageName = `${auth.currentUser.uid}_${timestamp}.jpg`;
+                    const imageName = `image_${timestamp}.jpg`;  // Simplified name without user ID
+                    console.log('Image name:', imageName);
+
+                    // Create storage reference
                     const imageRef = ref(storage, `images/${imageName}`);
+                    console.log('Storage reference created');
 
-                    // Upload the image
-                    const uploadResult = await uploadBytesResumable(imageRef, blob);
+                    // Upload with progress monitoring
+                    const uploadTask = uploadBytesResumable(imageRef, blob);
 
-                    // Get the download URL instead of the path
+                    // Monitor upload progress
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log('Upload progress:', progress + '%');
+                        },
+                        (error) => {
+                            console.error('Upload error:', error);
+                            throw error;
+                        }
+                    );
+
+                    // Wait for upload to complete
+                    await uploadTask;
+                    console.log('Upload completed');
+
+                    // Get download URL
                     imageUri = await getDownloadURL(imageRef);
+                    console.log('Download URL:', imageUri);
+
+                    // Clean up blob
+                    blob.close();
 
                 } catch (error) {
-                    console.error('Error uploading image:', error);
-                    Alert.alert('Error', 'Failed to upload image. Please try again.');
+                    console.error('Image upload error:', error);
+                    Alert.alert('Upload Error', 'Failed to upload image. Please try again.');
                     return;
                 }
             }
 
-            // Create the goal object with text and image URL
+            // Create goal object (this part still needs auth for Firestore)
             const newGoal = {
                 text: data.text,
-                imageUri: imageUri
+                imageUri: imageUri,
+                createdAt: new Date().toISOString(),
+                owner: auth.currentUser.uid  // We still need this for Firestore
             };
 
-            // Save to Firestore
+            // Save to database (this part handles its own auth check)
             await writeToDB(newGoal, "goals");
             setIsModalVisible(false);
+
         } catch (error) {
-            console.error("Error adding goal:", error);
+            console.error("Error in handleInputData:", error);
             Alert.alert('Error', 'Failed to save goal. Please try again.');
         }
     }
