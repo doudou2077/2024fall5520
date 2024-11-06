@@ -33,14 +33,9 @@ export const auth = initializeAuth(app, {
     persistence: getReactNativePersistence(AsyncStorage)
 });
 
-// Add this before initializing storage
-console.log('Firebase config:', {
-    ...firebaseConfig,
-    apiKey: '[HIDDEN]'
-});
 
 // Initialize storage with explicit bucket URL
-export const storage = getStorage(app, `gs://${process.env.EXPO_PUBLIC_storageBucket}`);
+export const storage = getStorage(app);
 
 // Verify storage initialization
 console.log('Storage initialized:', storage ? 'Yes' : 'No');

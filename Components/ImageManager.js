@@ -28,7 +28,6 @@ export default function ImageManager({ onImageTaken }) {
       // launch camera and get image
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
-        quality: 1,
       });
 
       // If imaged taken, pass URI to input.js

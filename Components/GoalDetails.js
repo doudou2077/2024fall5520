@@ -17,9 +17,10 @@ const GoalDetails = ({ route, navigation }) => {
         async function loadImage() {
             if (goal.imageUri) {
                 try {
-                    setLoading(true); // Only proceed if there's an image path
-                    const reference = ref(storage, goal.imageUri);  // Get reference
-                    const url = await getDownloadURL(reference);// Get URL
+                    setLoading(true);
+                    // The imageUri stored in Firestore should be the full path including 'images/'
+                    const reference = ref(storage, goal.imageUri);
+                    const url = await getDownloadURL(reference);
                     setImageUrl(url);
                 } catch (error) {
                     console.error("Error loading image:", error);
@@ -163,6 +164,18 @@ const styles = StyleSheet.create({
     moreDetailsButtonText: {
         color: 'white',
         fontSize: 16,
+    },
+    imageContainer: {
+        width: '100%',
+        height: 200,
+        marginVertical: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 8,
     },
 });
 

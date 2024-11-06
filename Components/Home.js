@@ -37,7 +37,7 @@ export default function Home({ navigation }) {
         );
 
         const unsubscribe = onSnapshot(
-            q,  // Use query instead of collection reference
+            q,
             (querySnapshot) => {
                 let newArray = [];
                 if (!querySnapshot.empty) {
@@ -75,78 +75,64 @@ export default function Home({ navigation }) {
     async function handleInputData(data) {
         try {
             let imageUri = null;
+            console.log('handleInputData started with:', data);
 
             if (data.imageUri) {
                 try {
                     console.log('Starting image upload process...');
-
-                    // Fetch the image
                     const response = await fetch(data.imageUri);
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch image: ${response.status}`);
-                    }
-                    console.log('Image fetch response:', response.status);
+                    console.log('Fetch response status:', response.status);
 
-                    // Create blob
                     const blob = await response.blob();
-                    console.log('Blob created, size:', blob.size, 'bytes');
+                    console.log('Blob created:', {
+                        size: blob.size,
+                        type: blob.type
+                    });
 
-                    // Create unique filename using timestamp only
-                    const timestamp = new Date().getTime();
-                    const imageName = `image_${timestamp}.jpg`;  // Simplified name without user ID
+                    // Get original filename from URI
+                    const imageName = data.imageUri.substring(data.imageUri.lastIndexOf('/') + 1);
                     console.log('Image name:', imageName);
 
-                    // Create storage reference
                     const imageRef = ref(storage, `images/${imageName}`);
-                    console.log('Storage reference created');
+                    console.log('Storage reference created:', imageRef.fullPath);
 
                     // Upload with progress monitoring
-                    const uploadTask = uploadBytesResumable(imageRef, blob);
-
-                    // Monitor upload progress
-                    uploadTask.on('state_changed',
-                        (snapshot) => {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            console.log('Upload progress:', progress + '%');
-                        },
-                        (error) => {
-                            console.error('Upload error:', error);
-                            throw error;
-                        }
-                    );
-
-                    // Wait for upload to complete
-                    await uploadTask;
-                    console.log('Upload completed');
+                    const uploadResult = await uploadBytesResumable(imageRef, blob);
+                    console.log('Upload completed:', uploadResult);
 
                     // Get download URL
-                    imageUri = await getDownloadURL(imageRef);
+                    imageUri = await getDownloadURL(uploadResult.ref);
                     console.log('Download URL:', imageUri);
 
                     // Clean up blob
                     blob.close();
+                    console.log('Blob cleaned up');
 
                 } catch (error) {
-                    console.error('Image upload error:', error);
-                    Alert.alert('Upload Error', 'Failed to upload image. Please try again.');
+                    console.error('Upload error:', {
+                        message: error.message,
+                        code: error.code,
+                        stack: error.stack
+                    });
+                    Alert.alert('Upload Error', error.message);
                     return;
                 }
             }
 
-            // Create goal object (this part still needs auth for Firestore)
             const newGoal = {
                 text: data.text,
                 imageUri: imageUri,
                 createdAt: new Date().toISOString(),
-                owner: auth.currentUser.uid  // We still need this for Firestore
+                owner: auth.currentUser.uid
             };
+            console.log('Saving goal:', newGoal);
 
-            // Save to database (this part handles its own auth check)
             await writeToDB(newGoal, "goals");
+            console.log('Goal saved successfully');
             setIsModalVisible(false);
 
         } catch (error) {
-            console.error("Error in handleInputData:", error);
+            console.error('handleInputData error:', error);
             Alert.alert('Error', 'Failed to save goal. Please try again.');
         }
     }
