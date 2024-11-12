@@ -6,24 +6,45 @@ import Input from './Input';
 import GoalItem from './GoalItem';
 import { database } from '../Firebase/FirebaseSetup';
 import { writeToDB, deleteFromDB, deleteAllFromDB } from '../Firebase/FirebaseHelper';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { storage } from '../Firebase/FirebaseSetup';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
 
 
 export default function Home({ navigation }) {
-    console.log(database);
     const appName = "My App";
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [goals, setGoals] = useState([]);
 
+    const auth = getAuth();
+
+
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(database, 'goals'),
+        console.log('Setting up Firestore listener');
+
+        // Check authentication
+        if (!auth.currentUser) {
+            console.log('No authenticated user');
+            navigation.replace('Login');
+            return;
+        }
+
+        // Query only user's own goals
+        const q = query(
+            collection(database, 'goals'),
+            where("owner", "==", auth.currentUser.uid)
+        );
+
+        const unsubscribe = onSnapshot(
+            q,
             (querySnapshot) => {
                 let newArray = [];
                 if (!querySnapshot.empty) {
                     querySnapshot.forEach((docSnapshot) => {
                         newArray.push({
-                            ...docSnapshot.data(),// Spread all fields from the document
-                            id: docSnapshot.id // Add the id as a separate field
+                            ...docSnapshot.data(),
+                            id: docSnapshot.id
                         });
                     });
                 }
@@ -31,11 +52,14 @@ export default function Home({ navigation }) {
             },
             (error) => {
                 console.error("Error listening to goals collection:", error);
+                if (error.code === 'permission-denied') {
+                    Alert.alert('Error', 'You do not have permission to access these goals');
+                }
             }
         );
 
         return () => unsubscribe();
-    }, []);
+    }, [auth.currentUser]);
 
     const closeModal = useCallback(() => {
         Alert.alert(
@@ -48,16 +72,89 @@ export default function Home({ navigation }) {
         );
     }, []);
 
-    async function handleInputData(text) {
-        const newGoal = { text: text };
+    async function handleInputData(data) {
         try {
+            let imageUri = null;
+            console.log('handleInputData started with:', data);
+
+            if (data.imageUri) {
+                try {
+                    console.log('Starting upload process...');
+
+                    // 1. Fetch and verify blob
+                    const response = await fetch(data.imageUri);
+                    const blob = await response.blob();
+                    console.log('Blob details:', {
+                        size: blob.size,
+                        type: blob.type
+                    });
+
+                    // 2. Verify storage reference
+                    const imageName = data.imageUri.substring(data.imageUri.lastIndexOf('/') + 1);
+                    const imageRef = ref(storage, `images/${imageName}`);
+                    console.log('Storage reference details:', {
+                        bucket: imageRef.bucket,
+                        fullPath: imageRef.fullPath,
+                        name: imageRef.name
+                    });
+
+                    // 3. Try upload with explicit error handling
+                    console.log('Starting upload...');
+                    const uploadTask = uploadBytesResumable(imageRef, blob);
+
+                    // Add upload monitoring
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log('Upload progress:', progress + '%');
+                        },
+                        (error) => {
+                            console.error('Upload task error:', {
+                                code: error.code,
+                                message: error.message,
+                                serverResponse: error.serverResponse,
+                                name: error.name
+                            });
+                        }
+                    );
+
+                    const uploadResult = await uploadTask;
+                    console.log('Upload successful:', uploadResult);
+
+                    imageUri = await getDownloadURL(uploadResult.ref);
+                    console.log('Got download URL');
+
+                    blob.close();
+                } catch (error) {
+                    console.error('Upload error details:', {
+                        code: error.code,
+                        message: error.message,
+                        serverResponse: error.serverResponse,
+                        name: error.name,
+                        stack: error.stack
+                    });
+                    Alert.alert('Upload Error', error.message);
+                    return;
+                }
+            }
+
+            const newGoal = {
+                text: data.text,
+                imageUri: imageUri,
+                createdAt: new Date().toISOString(),
+                owner: auth.currentUser.uid
+            };
+            console.log('Saving goal:', newGoal);
+
             await writeToDB(newGoal, "goals");
+            console.log('Goal saved successfully');
             setIsModalVisible(false);
+
         } catch (error) {
-            console.error("Error adding goal:", error);
+            console.error('handleInputData error:', error);
+            Alert.alert('Error', 'Failed to save goal. Please try again.');
         }
     }
-
 
     const renderItem = ({ item, separators }) => (
         <GoalItem

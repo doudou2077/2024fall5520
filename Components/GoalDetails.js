@@ -1,11 +1,38 @@
-import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
+import { View, Text, StyleSheet, Alert, Image } from 'react-native';  // Add Image here
 import Ionicons from '@expo/vector-icons/Ionicons';
 import PressableButton from './PressableButton';
+import { updateWarningStatus } from '../Firebase/FirebaseHelper';
+import GoalUsers from './GoalUsers';
+import { storage } from '../Firebase/FirebaseSetup';
+import { getDownloadURL, ref } from "firebase/storage";
 
 const GoalDetails = ({ route, navigation }) => {
     const { goal } = route.params;
-    const [isWarning, setIsWarning] = useState(false);
+    const [isWarning, setIsWarning] = useState(goal.warning || false);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        async function loadImage() {
+            if (goal.imageUri) {
+                try {
+                    setLoading(true);
+                    // The imageUri stored in Firestore should be the full path including 'images/'
+                    const reference = ref(storage, goal.imageUri);
+                    const url = await getDownloadURL(reference);
+                    setImageUrl(url);
+                } catch (error) {
+                    console.error("Error loading image:", error);
+                    Alert.alert("Error", "Failed to load image");
+                } finally {
+                    setLoading(false);
+                }
+            }
+        }
+
+        loadImage();
+    }, [goal.imageUri]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -16,7 +43,7 @@ const GoalDetails = ({ route, navigation }) => {
                     : (goal && goal.text ? goal.text : 'Goal Details')),
             headerRight: () => (
                 <PressableButton
-                    onPress={() => setIsWarning(!isWarning)}
+                    onPress={handleWarningToggle}
                     style={styles.headerButton}
                     pressedStyle={styles.headerButtonPressed}
                 >
@@ -30,12 +57,24 @@ const GoalDetails = ({ route, navigation }) => {
         });
     }, [navigation, isWarning, goal, route.params]);
 
+    const handleWarningToggle = async () => {
+        try {
+            const newWarningStatus = !isWarning;
+            await updateWarningStatus(goal.id, 'goals', newWarningStatus);
+            setIsWarning(newWarningStatus);
+        } catch (error) {
+            console.error('Error toggling warning status:', error);
+            Alert.alert('Error', 'Failed to update warning status. Please try again.');
+        }
+    }
     const handleMoreDetails = () => {
         navigation.push('GoalDetails', {
             moreDetails: "More Details",
             goalText: goal.text
         });
     };
+
+
 
     if (route.params.moreDetails) {
         return (
@@ -50,6 +89,24 @@ const GoalDetails = ({ route, navigation }) => {
             <Text style={[styles.title, isWarning && styles.warningText]}>Goal Details</Text>
             <Text style={[styles.goalText, isWarning && styles.warningText]}>Goal: {goal.text}</Text>
             <Text style={[styles.goalId, isWarning && styles.warningText]}>Goal ID: {goal.id}</Text>
+
+            {/* Add image display */}
+            {goal.imageUri && (
+                <View style={styles.imageContainer}>
+                    {loading ? (
+                        <Text>Loading image...</Text>
+                    ) : imageUrl ? (
+                        <Image
+                            source={{ uri: imageUrl }}
+                            style={styles.image}
+                            resizeMode="contain"
+                        />
+                    ) : (
+                        <Text>Failed to load image</Text>
+                    )}
+                </View>
+            )}
+
             <View style={styles.buttonContainer}>
                 <PressableButton
                     onPress={handleMoreDetails}
@@ -59,6 +116,7 @@ const GoalDetails = ({ route, navigation }) => {
                     More Details
                 </PressableButton>
             </View>
+            <GoalUsers goalId={goal.id} />
         </View>
     );
 };
@@ -73,7 +131,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 200,
     },
     goalText: {
         fontSize: 18,
@@ -106,6 +164,18 @@ const styles = StyleSheet.create({
     moreDetailsButtonText: {
         color: 'white',
         fontSize: 16,
+    },
+    imageContainer: {
+        width: '100%',
+        height: 200,
+        marginVertical: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 8,
     },
 });
 
