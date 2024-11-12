@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, deleteDoc, getDocs, updateDoc, query, where } from "firebase/firestore";
+import { addDoc, collection, doc, deleteDoc, getDocs, updateDoc, query, where, setDoc, getDoc } from "firebase/firestore";
 import { database } from "./FirebaseSetup";
 import { getAuth } from "firebase/auth";
 
@@ -105,5 +105,52 @@ export async function readAllDocs(collectionPath) {
     } catch (err) {
         console.error('Error reading documents:', err);
         throw err;
+    }
+}
+
+
+export async function saveUserLocation(location) {
+    try {
+        if (!auth.currentUser) {
+            throw new Error('User must be authenticated');
+        }
+
+        const userDocRef = doc(database, 'users', auth.currentUser.uid);
+        await setDoc(userDocRef, {
+            location: {
+                latitude: location.latitude,
+                longitude: location.longitude,
+                updatedAt: new Date().toISOString()
+            }
+        }, { merge: true });  // This will update the location without overwriting other user data
+
+        console.log('Location saved successfully');
+    } catch (error) {
+        console.error('Error saving location:', error);
+        throw error;
+    }
+}
+
+
+
+export async function getUserLocation() {
+    try {
+        if (!auth.currentUser) {
+            throw new Error('User must be authenticated');
+        }
+
+        const userDocRef = doc(database, 'users', auth.currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists()) {
+            const userData = docSnap.data();
+            return userData.location;
+        } else {
+            console.log('No location found for user');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error getting user location:', error);
+        throw error;
     }
 }
