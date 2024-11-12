@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import React from 'react'
 import { auth } from '../Firebase/FirebaseSetup'
+import LocationManager from './LocationManager';
 
 export default function Profile({ navigation }) {
     const currentUser = auth.currentUser;
@@ -18,6 +19,8 @@ export default function Profile({ navigation }) {
                 <Text style={styles.label}>User ID:</Text>
                 <Text style={styles.info}>{currentUser?.uid}</Text>
             </View>
+
+            <LocationManager navigation={navigation} />
         </View>
     )
 }
