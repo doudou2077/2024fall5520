@@ -11,6 +11,7 @@ import Signup from './Components/Signup';
 import Profile from './Components/Profile';
 import { Ionicons } from '@expo/vector-icons';
 import Octicons from '@expo/vector-icons/Octicons';
+import Map from './Components/Map';
 
 const Stack = createNativeStackNavigator();
 
@@ -96,6 +97,15 @@ const AppStack = (
         ),
       })}
     />
+
+    <Stack.Screen
+      name="Map"
+      component={Map}
+      options={{
+        title: 'Location Map',
+      }}
+    />
+
   </>
 );
 
