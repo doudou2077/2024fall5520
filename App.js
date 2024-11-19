@@ -12,6 +12,7 @@ import Profile from './Components/Profile';
 import { Ionicons } from '@expo/vector-icons';
 import Octicons from '@expo/vector-icons/Octicons';
 import Map from './Components/Map';
+import * as Notifications from 'expo-notifications';
 
 const Stack = createNativeStackNavigator();
 
@@ -109,6 +110,15 @@ const AppStack = (
   </>
 );
 
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 const App = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -122,8 +132,47 @@ const App = () => {
     return unsubscribe;
   }, []);
 
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        // This function runs when a notification is received while app is running
+        console.log('Notification received:', notification);
+        Alert.alert(
+          notification.request.content.title,
+          notification.request.content.body
+        );
+      }
+    );
+
+    // Cleanup function to remove the listener when component unmounts
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        // This runs when user taps on the notification
+        console.log('Notification tapped:', response);
+
+        // Access the custom data passed with the notification
+        const userData = response.notification.request.content.data;
+        console.log('Custom data:', userData);
+
+        // You can navigate or perform actions based on the notification
+        Alert.alert(
+          'Notification Tapped',
+          'You responded to the notification!'
+        );
+      }
+    );
+
+    return () => subscription.remove();
+  }, []);
+
+
   if (loading) {
-    return null; // Or a loading spinner
+    return null;
   }
 
   return (
