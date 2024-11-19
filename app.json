@@ -3,6 +3,11 @@
     "name": "Fall2024-Tue",
     "slug": "Fall2024-Tue",
     "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "24716616-a717-4189-be68-b299910f177b"
+      }
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -27,7 +32,14 @@
       [
         "expo-image-picker",
         {
-          "cameraPermission": "The app needs access to your camera."
+          "cameraPermission": "The app needs access to your camera.",
+          "photoPermission": "The app needs access to your photos."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
     ]
