@@ -68,7 +68,7 @@ const AppStack = (
       })}
     />
     <Stack.Screen
-      name="GoalDetails"  // Changed from "Details" to "GoalDetails"
+      name="GoalDetails"
       component={GoalDetails}
       options={({ route }) => ({
         title: route.params?.goal?.text || 'Goal Details',
@@ -152,14 +152,12 @@ const App = () => {
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener(
       (response) => {
-        // This runs when user taps on the notification
         console.log('Notification tapped:', response);
 
         // Access the custom data passed with the notification
         const userData = response.notification.request.content.data;
         console.log('Custom data:', userData);
 
-        // You can navigate or perform actions based on the notification
         Alert.alert(
           'Notification Tapped',
           'You responded to the notification!'

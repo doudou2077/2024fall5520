@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { StyleSheet, View, Button, FlatList, Text, Alert } from 'react-native';
+import { StyleSheet, View, Button, FlatList, Text, Alert, Platform } from 'react-native';
 import PressableButton from './PressableButton';
 import Header from './Header';
 import Input from './Input';
@@ -10,12 +10,15 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { storage } from '../Firebase/FirebaseSetup';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 
 
 export default function Home({ navigation }) {
     const appName = "My App";
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [goals, setGoals] = useState([]);
+    const [pushToken, setPushToken] = useState(null);
 
     const auth = getAuth();
 
@@ -60,6 +63,75 @@ export default function Home({ navigation }) {
 
         return () => unsubscribe();
     }, [auth.currentUser]);
+
+    async function registerForPushNotifications() {
+        try {
+            // 1. Check for Android
+            if (Platform.OS === 'android') {
+                await Notifications.setNotificationChannelAsync('default', {
+                    name: 'default',
+                    importance: Notifications.AndroidImportance.MAX,
+                });
+            }
+
+            // 2. Get permission
+            const { status } = await Notifications.getPermissionsAsync();
+            if (status !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                if (status !== 'granted') {
+                    Alert.alert('Failed to get push token for push notification!');
+                    return;
+                }
+            }
+
+            // 3. Get push token
+            const tokenData = await Notifications.getExpoPushTokenAsync({
+                projectId: Constants.expoConfig.extra.eas.projectId,
+            });
+
+            setPushToken(tokenData.data);  // Save token to state
+            console.log('Push token:', tokenData.data);
+
+        } catch (error) {
+            console.error('Error getting push token:', error);
+        }
+    }
+
+    useEffect(() => {
+        registerForPushNotifications();
+    }, []);
+
+    const sendPushNotification = async () => {
+        try {
+            if (!pushToken) {
+                Alert.alert('Error', 'Push token not available');
+                return;
+            }
+
+            const response = await fetch('https://exp.host/--/api/v2/push/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    to: pushToken,
+                    title: "Push Notification",
+                    body: "This is a push notification",
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to send push notification');
+            }
+
+            Alert.alert('Success', 'Push notification sent!');
+        } catch (error) {
+            console.error('Error sending push notification:', error);
+            Alert.alert('Error', 'Failed to send push notification');
+        }
+    };
+
+
 
     const closeModal = useCallback(() => {
         Alert.alert(
@@ -251,22 +323,16 @@ export default function Home({ navigation }) {
                 >
                     Add a Goal
                 </PressableButton>
+                <Button
+                    title="Send Push Notification"
+                    onPress={sendPushNotification}
+                />
             </View>
 
             <View style={styles.bottomContainer}>
                 <FlatList
-                    data={goals}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={styles.listContainerStyle}
-                    ListEmptyComponent={EmptyListComponent}
-                    ListHeaderComponent={goals.length > 0 ? ListHeader : null}
-                    ListFooterComponent={goals.length > 0 ? <ListFooter onPressDeleteAll={handleDeleteAll} /> : null}
-                    ItemSeparatorComponent={({ highlighted }) => (
-                        <ItemSeparator highlighted={highlighted} />
-                    )}
+                // ... existing FlatList props ...
                 />
-
             </View>
 
             <Input
