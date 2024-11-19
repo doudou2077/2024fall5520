@@ -1,27 +1,31 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import React from 'react'
 import { auth } from '../Firebase/FirebaseSetup'
 import LocationManager from './LocationManager';
+import NotificationManager from './NotificationManager';
 
 export default function Profile({ navigation }) {
     const currentUser = auth.currentUser;
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Profile Information</Text>
+        <ScrollView style={styles.container}>
+            <View style={styles.contentContainer}>
+                <Text style={styles.title}>Profile Information</Text>
 
-            <View style={styles.infoContainer}>
-                <Text style={styles.label}>Email:</Text>
-                <Text style={styles.info}>{currentUser?.email}</Text>
+                <View style={styles.infoContainer}>
+                    <Text style={styles.label}>Email:</Text>
+                    <Text style={styles.info}>{currentUser?.email}</Text>
+                </View>
+
+                <View style={styles.infoContainer}>
+                    <Text style={styles.label}>User ID:</Text>
+                    <Text style={styles.info}>{currentUser?.uid}</Text>
+                </View>
+
+                <LocationManager navigation={navigation} />
+                <NotificationManager />
             </View>
-
-            <View style={styles.infoContainer}>
-                <Text style={styles.label}>User ID:</Text>
-                <Text style={styles.info}>{currentUser?.uid}</Text>
-            </View>
-
-            <LocationManager navigation={navigation} />
-        </View>
+        </ScrollView>
     )
 }
 
@@ -29,8 +33,10 @@ export default function Profile({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
         backgroundColor: 'white',
+    },
+    contentContainer: {
+        padding: 20,
     },
     title: {
         fontSize: 24,
