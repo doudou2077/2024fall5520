@@ -58,7 +58,7 @@ export default function LocationManager({ navigation, route }) {
         } catch (error) {
             Alert.alert('Error', 'Failed to get location: ' + error.message);
         } finally {
-            setIsLoading(false);  // Add this line
+            setIsLoading(false);
         }
     }
 
