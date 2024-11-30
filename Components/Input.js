@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
 import { TextInput, View, Text, Button, Modal, StyleSheet, Image } from 'react-native';
+import ImageManager from './ImageManager';
 
 export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCancel }) {
     const [text, setText] = useState("");
     const [isFocused, setIsFocused] = useState(false);
+    const [imageUri, setImageUri] = useState(null);
+
+
+    const handleImageTaken = (uri) => {
+        setImageUri(uri);
+    };
 
     const handleConfirm = () => {
-        console.log("Final text on confirm:", text);
-        onDataConfirm(text);
+        console.log("Final text on confirm:", { text, imageUri });
+        onDataConfirm({ text, imageUri });
         setText("");
+        setImageUri(null);
     };
 
     const handleCancel = () => {
         onCancel();
         setText('');
+        setImageUri(null)
     };
 
     const isConfirmEnabled = text.length >= 3;
@@ -33,6 +42,7 @@ export default function Input({ shouldFocus, onDataConfirm, isModalVisible, onCa
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                     />
+                    <ImageManager onImageTaken={handleImageTaken} />
                     {isFocused && text.length > 0 && (
                         <Text>
                             {text.length >= 3 ? "Thank you!" : "Please type more than 3 characters"}
